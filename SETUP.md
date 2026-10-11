@@ -23,7 +23,7 @@ There is also a native Android version in the `android/` folder: the same `index
 
 1. **Host the file** so you can open it on your phone (see *Hosting* below) — or just open `index.html` in a desktop browser to try it.
 2. Get a **Gemini key**: go to https://aistudio.google.com/apikey → *Create API key* → copy it.
-3. In the app: **Settings → Gemini AI → API key**, paste it, tap **Load models** (it picks the newest Flash model, e.g. `gemini-3.8-flash`), then **Test key**. Below the model is the **fallback ladder**: when the chosen model is over quota, missing or lacks a feature, the app silently tries the next model in that list and tells you which one answered. Keep `gemini-2.5-flash` in it if you use a free key (see *Limits*).
+3. In the app: **Settings → Gemini AI → API key**, paste it, tap **Load models** (it picks the newest Flash model, e.g. `gemini-3.8-flash`), then **Test key**. Below the model is the **fallback ladder**: when the chosen model is over quota, missing or lacks a feature, the app silently tries the next model in that list and tells you which one answered. The default list ends with the Gemini 2.5 models, which still have free web-search quota on older projects (see *Limits*).
 4. Tap **＋** to register your first device. Tap **Scan the rating label**, photograph the sticker with the model/serial number, and the fields fill themselves. Add the manual: photograph the pages, tap **Add PDF**, or use **Find the manual online**. Save.
 5. Open the device → **Ask a question**. Answers carry page references like `📄 p.3` — tap one to see that page. Done.
 
@@ -54,7 +54,7 @@ After that, saving a device auto-backs-up to Drive. Use **Back up now** / **Rest
 The app is one file (`index.html`). Any static host works. Easiest options:
 
 - **Cloudflare Pages / Netlify** — drag-and-drop the file onto their dashboard; you get an `https://…` URL instantly. Use that URL as your OAuth origin.
-- **GitHub Pages** — put `index.html` in a repo, enable Pages.
+- **GitHub Pages** — this repo is published at **https://dima-kravtsoff.github.io/DeviceVault/** (Settings → Pages, branch `main`, folder `/`). Every push to `main` redeploys `index.html` within a minute or two. Use that address as the OAuth origin for Drive.
 - **Your own web space** — just upload the file.
 - **Just trying it on desktop** — double-click `index.html` (AI works; Drive won't, since OAuth needs a hosted origin).
 
@@ -83,7 +83,7 @@ Once it's on an `https://` URL, open it on your phone and use **Share → Add to
 - **Limits:** Gemini reads PDFs up to **50 MB / 1000 pages** each (larger ones can still be viewed, but are skipped for answers — use a compressed copy). Up to **16 photographed pages** are sent per question, so prefer the PDF for long manuals. Photographed pages should be legible.
 - The PDF viewer and thumbnails use **pdf.js**, loaded from cdnjs the first time it's needed, so viewing PDFs in the browser needs an internet connection (the "Open ↗" button uses the browser's own viewer as a fallback). The Android app bundles pdf.js and works offline.
 - Warranty reminders are shown inside the app and can be added to your calendar; the app has no server, so it cannot push notifications on its own.
-- **Finding manuals online uses Google Search grounding, which has no free quota on Gemini 3 models** — on a free key those requests fail with "You exceeded your current quota". Gemini 2.5 Flash / Flash-Lite still get 500 free grounded searches a day, so the default fallback ladder ends with them and the search falls through automatically (the sheet shows *Answered by gemini-2.5-flash*). With billing enabled on your Google Cloud project, Gemini 3 models get 5,000 free searches a month and then cost money; see Google's Gemini API pricing page. The other features cost only normal generation tokens.
+- **Finding manuals online:** Gemini's Google Search grounding has no free quota on Gemini 3 models, and the Gemini 2.5 models (which still had 500 free searches a day) are closed to projects created recently — so with a new free key every model fails with "You exceeded your current quota" / "no longer available to new users". The **Android app** then searches the web itself (DuckDuckGo, or Bing when DuckDuckGo asks for a human check) and lets Gemini sort the results into official / third-party / unrelated; the ⬇ attach button also works for sites that block cross-site downloads there. The **browser version** cannot fetch other sites, so it shows the quick-search links and the paste-a-link box instead. With billing enabled on your Google Cloud project, Gemini 3 models get 5,000 free searches a month and the Gemini search is used first. The other features cost only normal generation tokens.
 - The AI can be wrong; for anything safety-critical (gas, electrical, warranty), follow the official manual.
 
 ---

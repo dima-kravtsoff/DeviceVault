@@ -18,7 +18,8 @@ so editing the web app updates the Android app on the next build.
 | Back button / back gesture | Asks the page first (`dvBack()` closes viewers, sheets and sub-screens); leaves the app only from the Devices list. |
 | Dark / light | Follows the system theme (`prefers-color-scheme`). |
 | Google Drive sync | Google Play services' Authorization API supplies the `drive.file` access token; the page's own Drive code is unchanged. See *Drive setup* below. |
-| Gemini model ladder | Shared with the web app: when the chosen model is over quota / missing, the page falls back through the list in Settings. On a free key, manual search (Google Search grounding) only works on `gemini-2.5-flash`, so keep it in the list. |
+| Gemini model ladder | Shared with the web app: when the chosen model is over quota / missing, the page falls back through the list in Settings. |
+| Web search without Google Search quota | `https://appassets.androidplatform.net/proxy/?u=<https url>` is a same-origin GET gateway (`MainActivity.proxyFetch`): the page uses it to read DuckDuckGo results when Gemini has no search quota, and to download manual PDFs from sites that block cross-origin requests. Only https targets, only from this WebView; the browser version has no equivalent and shows the quick-search links instead. |
 | Rotation | The activity handles configuration changes, so rotating a tablet never reloads the page. |
 
 Package name: `com.devicevault.app`. Min Android 9 (API 28), target API 36.
@@ -68,7 +69,7 @@ storage and JSON export/import still work.
 ```
 android/
   app/src/main/java/com/devicevault/app/
-    MainActivity.kt   WebView setup, file chooser, popups, back handling, insets, dark mode
+    MainActivity.kt   WebView setup, file chooser, popups, back handling, insets, dark mode, /proxy/ gateway
     Bridge.kt         window.Android: openUrl, chunked file transfer (open/save), Drive token, SHA-1
     DriveAuth.kt      Play services Authorization API → access token for drive.file
   app/src/main/assets/www/pdfjs/   pdf.js (library + worker)

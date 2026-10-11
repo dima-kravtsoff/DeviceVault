@@ -1359,8 +1359,8 @@ function openFindManual(ctx){
     </div>
     <button class="btn primary" id="aiFindBtn" onclick="aiFindManual()" ${(hasKey||PROXY)?'':'disabled'}>${hasKey?'✨ Let Gemini search for it':'🔎 Search the web for it'}</button>
     ${hasKey
-      ? `<p class="note" style="margin-top:8px">Uses Gemini with Google Search — the brand and model are sent to Google.${PROXY?' If your key has no Google Search quota, the app searches DuckDuckGo instead and Gemini sorts the results.':''}</p>`
-      : (PROXY ? '<p class="note" style="margin-top:8px">Searches DuckDuckGo for the brand and model. Add a Gemini key in Settings to have Gemini sort the results.</p>'
+      ? `<p class="note" style="margin-top:8px">Uses Gemini with Google Search — the brand and model are sent to Google.${PROXY?' If your key has no Google Search quota, the app searches the web itself (DuckDuckGo, or Bing as a fallback) and Gemini sorts the results.':''}</p>`
+      : (PROXY ? '<p class="note" style="margin-top:8px">Searches the web (DuckDuckGo, or Bing as a fallback) for the brand and model. Add a Gemini key in Settings to have Gemini sort the results.</p>'
                : '<p class="note warn" style="margin-top:8px">Add your Gemini key in Settings to enable the AI search.</p>')}
     <div id="findOut"></div>
     <div class="divider"></div>
@@ -1427,12 +1427,35 @@ function searchUnavailableHtml(e){
     : e.message;
   return `<p class="note warn" style="margin-top:10px">${esc(why)} Use the quick searches above (they open in your browser), then paste the PDF link below.${e.failed?`<details style="margin-top:6px"><summary>Details</summary>${esc(e.message)}</details>`:''}</p>`;
 }
-/* Web search without any API key: DuckDuckGo's HTML results, read through the Android shell's gateway. */
+/* Web search without any API key, read through the Android shell's gateway: DuckDuckGo's HTML results
+   first, Bing's RSS feed when DuckDuckGo answers with its "are you human" page (it does that after a
+   burst of searches from one network). Resolves to {results:[{title,url,snippet}], engine}. */
 async function webSearch(q,{pdfOnly=false}={}){
   if(!PROXY) throw new Error('Web search needs the DeviceVault app');
-  const r=await fetch(PROXY('https://html.duckduckgo.com/html/?q='+encodeURIComponent(q+(pdfOnly?' filetype:pdf':''))));
-  if(!r.ok) throw new Error('search request failed (HTTP '+r.status+')');
-  return parseDdg(await r.text());
+  const query=q+(pdfOnly?' filetype:pdf':''), errors=[];
+  try{
+    const r=await fetch(PROXY('https://html.duckduckgo.com/html/?q='+encodeURIComponent(query)));
+    const html=r.ok?await r.text():'';
+    if(r.status===202 || /anomaly\.js|challenge-form/.test(html)) throw new Error('DuckDuckGo asked for a human check (too many searches from this network)');
+    if(!r.ok) throw new Error('DuckDuckGo: HTTP '+r.status);
+    return {results:parseDdg(html), engine:'DuckDuckGo'};
+  }catch(e){ errors.push(e.message); }
+  try{
+    const r=await fetch(PROXY('https://www.bing.com/search?format=rss&q='+encodeURIComponent(query)));
+    if(!r.ok) throw new Error('Bing: HTTP '+r.status);
+    return {results:parseBingRss(await r.text()), engine:'Bing'};
+  }catch(e){ errors.push(e.message); }
+  throw new Error('Web search failed — '+errors.join('; '));
+}
+function parseBingRss(xml){
+  const doc=new DOMParser().parseFromString(xml,'text/xml'); const out=[], seen=new Set();
+  const text=(el,sel)=>((el.querySelector(sel)||{}).textContent||'').trim().replace(/\s+/g,' ');
+  for(const it of doc.querySelectorAll('item')){
+    const url=text(it,'link');
+    if(!/^https?:\/\//i.test(url)||/\.bing\.com\//i.test(url)||seen.has(url)) continue; seen.add(url);
+    out.push({title:text(it,'title'), url, snippet:text(it,'description')});
+  }
+  return out;
 }
 function parseDdg(html){
   const doc=new DOMParser().parseFromString(html,'text/html'); const out=[], seen=new Set();
@@ -1443,7 +1466,7 @@ function parseDdg(html){
     try{ const u=new URL(url,'https://duckduckgo.com'); url=u.searchParams.get('uddg')||u.href; }catch(e){ continue; }
     if(!/^https?:\/\//i.test(url)||/duckduckgo\.com\//i.test(url)||seen.has(url)) continue; seen.add(url);
     const snippet=((res.querySelector('.result__snippet')||{}).textContent||'').trim().replace(/\s+/g,' ');
-    out.push({title:a.textContent.trim().replace(/\s+/g,' '), url, snippet});
+    out.push({title:a.textContent.trim().replace(/\s+/g,' ').replace(/^PDF\s+/,''), url, snippet});
   }
   return out;
 }
@@ -1458,11 +1481,12 @@ async function webFindManual(c,out,geminiErr){
   const settled=await Promise.allSettled([webSearch(q,{pdfOnly:true}), webSearch(q)]);
   const ok=settled.filter(s=>s.status==='fulfilled').map(s=>s.value);
   if(!ok.length) throw settled[0].reason;
+  const engine=[...new Set(ok.map(o=>o.engine))].join(' + ');
   const rows=[], seen=new Set();
-  for(const r of [...(ok[0]||[]).slice(0,4), ...(ok[1]||ok[0])]){ if(seen.has(r.url)) continue; seen.add(r.url); rows.push({title:r.title, url:r.url, snippet:r.snippet, note:webNote(r)}); }
-  const why = geminiErr.noKey ? 'Results from DuckDuckGo for “'+q+'”.'
-    : geminiErr.failed ? "Gemini's Google Search isn't available on this API key (no free search quota on Gemini 3; the 2.5 models are closed to new projects), so these come from DuckDuckGo for “"+q+"”."
-    : "Gemini's search failed ("+geminiErr.message+"), so these come from DuckDuckGo for “"+q+"”.";
+  for(const r of [...ok[0].results.slice(0,4), ...(ok[1]||ok[0]).results]){ if(seen.has(r.url)) continue; seen.add(r.url); rows.push({title:r.title, url:r.url, snippet:r.snippet, note:webNote(r)}); }
+  const why = geminiErr.noKey ? 'Results from '+engine+' for “'+q+'”.'
+    : geminiErr.failed ? "Gemini's Google Search isn't available on this API key (no free search quota on Gemini 3; the 2.5 models are closed to new projects), so these come from "+engine+" for “"+q+"”."
+    : "Gemini's search failed ("+geminiErr.message+"), so these come from "+engine+" for “"+q+"”.";
   const render=(list,extra)=>{ c.results=list; out.innerHTML=`<p class="note" style="margin-top:10px">${esc(why)}${extra||''}</p>`+(list.length?'<h5>Found on the web</h5>'+list.map((r,i)=>linkRow(r,i)).join(''):'<p class="note warn">Nothing found. Try the quick searches above or a different spelling of the model number.</p>'); };
   render(rows.slice(0,12));
   if(!rows.length || !state.settings.geminiKey) return;
