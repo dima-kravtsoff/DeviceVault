@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">DeviceVault</string>
+    <string name="choose_photo">Add a photo</string>
+    <string name="choose_pdf">Choose a PDF</string>
+    <string name="choose_file">Choose a file</string>
+    <string name="open_with">Open with</string>
+    <string name="no_app_for_file">No app on this device can open this file. Saving it instead.</string>
+    <string name="no_browser">No browser app is installed.</string>
+    <string name="file_saved">Saved</string>
+    <string name="file_save_failed">Could not save the file</string>
+</resources>

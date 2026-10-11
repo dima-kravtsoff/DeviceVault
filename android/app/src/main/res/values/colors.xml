@@ -1,0 +1,5 @@
+<resources>
+    <!-- Mirrors the light-theme page background of index.html -->
+    <color name="page_bg">#EEF2F9</color>
+    <color name="ic_bg">#4F8CFF</color>
+</resources>

@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#0f1420" />
+<meta name="color-scheme" content="dark light" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="mobile-web-app-capable" content="yes" />
+<title>DeviceVault — Manuals</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%234f8cff'/%3E%3Cpath d='M28 26h32a8 8 0 0 1 8 8v40H36a8 8 0 0 1-8-8V26z' fill='white' opacity='.95'/%3E%3Cpath d='M60 26h12v40a8 8 0 0 1-8 8h-4V26z' fill='white' opacity='.7'/%3E%3C/svg%3E" />
+<style>
+  :root{
+    --bg:#0f1420; --bg2:#151c2c; --card:#1a2334; --card2:#212c42;
+    --line:#2a3550; --text:#eaf0fb; --muted:#93a1bf; --muted2:#6c7a9c;
+    --accent:#4f8cff; --accent2:#3a6fe0; --danger:#ff5c6c; --ok:#38d39f; --warn:#ffb020;
+    --shadow:0 8px 30px rgba(0,0,0,.35);
+    --radius:18px;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#eef2f9; --bg2:#e6ecf6; --card:#ffffff; --card2:#f3f6fc;
+      --line:#dce3ef; --text:#131a29; --muted:#5b6a86; --muted2:#8494ad;
+      --accent:#2f6fe0; --accent2:#2860c8; --shadow:0 8px 24px rgba(30,50,90,.12);
+    }
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display:flex; flex-direction:column; min-height:100dvh;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent); text-decoration:none}
+  button{font-family:inherit}
+
+  /* Header */
+  header.app{
+    position:sticky; top:0; z-index:20;
+    padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;
+    background:linear-gradient(180deg,var(--bg) 60%,transparent);
+    display:flex; align-items:center; gap:10px;
+  }
+  header.app .logo{width:30px;height:30px;border-radius:9px;flex:0 0 auto}
+  header.app h1{font-size:19px;margin:0;font-weight:700;letter-spacing:.2px;flex:1}
+  .pill{
+    font-size:12px;font-weight:600;padding:6px 11px;border-radius:999px;
+    display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);
+    background:var(--card);color:var(--muted);white-space:nowrap
+  }
+  .pill .dot{width:8px;height:8px;border-radius:50%;background:var(--muted2)}
+  .pill.on{color:var(--ok);border-color:rgba(56,211,159,.4)}
+  .pill.on .dot{background:var(--ok)}
+  .pill.warn{color:var(--warn);border-color:rgba(255,176,32,.35)}
+  .pill.warn .dot{background:var(--warn)}
+
+  main{flex:1;overflow-y:auto;padding:4px 16px 120px;-webkit-overflow-scrolling:touch}
+  .view{animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  h2.section{font-size:22px;margin:8px 2px 14px;font-weight:750}
+  .sub{color:var(--muted);font-size:14px;margin:-8px 2px 16px;line-height:1.5}
+
+  /* Cards / grid */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(min-width:620px){.grid{grid-template-columns:1fr 1fr 1fr}}
+  .dcard{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;cursor:pointer;transition:transform .12s ease,border-color .12s;
+    display:flex;flex-direction:column
+  }
+  .dcard:active{transform:scale(.975)}
+  .dcard .thumb{aspect-ratio:4/3;background:var(--card2) center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+  .dcard .thumb .ph{font-size:40px;opacity:.4}
+  .dcard .body{padding:10px 12px 12px}
+  .dcard .name{font-weight:680;font-size:15px;line-height:1.25;margin:0 0 3px}
+  .dcard .meta{color:var(--muted);font-size:12.5px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chip{display:inline-block;font-size:11px;font-weight:600;color:var(--accent);background:rgba(79,140,255,.13);padding:3px 8px;border-radius:999px;margin-top:8px;margin-right:4px}
+  .chip.warn{color:var(--warn);background:rgba(255,176,32,.14)}
+  .chip.muted{color:var(--muted);background:rgba(147,161,191,.16)}
+
+  /* Empty state */
+  .empty{text-align:center;padding:56px 20px;color:var(--muted)}
+  .empty .big{font-size:52px;margin-bottom:10px}
+  .empty h3{color:var(--text);margin:.2em 0;font-size:18px}
+
+  /* Inputs */
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px;padding-left:2px}
+  input,textarea,select{
+    width:100%;padding:13px 14px;border-radius:13px;border:1px solid var(--line);
+    background:var(--card);color:var(--text);font-size:16px;outline:none;transition:border-color .15s
+  }
+  input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+  textarea{resize:vertical;min-height:80px;line-height:1.5}
+  select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2393a1bf'%3E%3Cpath d='M6 8 1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .quick{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:-6px 0 14px}
+  .quick .btn.sm{padding:7px 11px;font-size:12.5px}
+
+  /* Buttons */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:13px 18px;border-radius:14px;border:1px solid var(--line);
+    background:var(--card);color:var(--text);font-size:15px;font-weight:650;cursor:pointer;
+    transition:transform .1s, background .15s, opacity .15s; width:100%
+  }
+  .btn:active{transform:scale(.98)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:disabled{opacity:.5}
+  .btn:disabled{opacity:.6;cursor:default}
+  .btn.ghost{background:transparent}
+  .btn.danger{color:var(--danger);border-color:rgba(255,92,108,.4)}
+  .btn.sm{padding:9px 13px;font-size:13.5px;width:auto;border-radius:11px}
+  .btn.wide{width:100%}
+  .btnrow{display:flex;gap:10px}
+  .btnrow>.btn{flex:1}
+
+  /* Photo picker */
+  .thumbrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+  .tphoto{position:relative;width:84px;height:84px;border-radius:13px;overflow:hidden;border:1px solid var(--line);background:var(--card2) center/cover no-repeat}
+  .tphoto .rm{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.62);color:#fff;border:none;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .tphoto .lbl{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.62);color:#fff;font-size:10.5px;font-weight:600;padding:3px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+  .tphoto .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;opacity:.5;pointer-events:none}
+  .tphoto.pdf{cursor:pointer}
+  .addphoto{width:84px;height:84px;border-radius:13px;border:1.5px dashed var(--line);background:var(--card);color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;font-size:12px}
+  .addphoto .ic{font-size:22px}
+  input[type=file]{display:none}
+
+  /* Detail */
+  .gallery{display:flex;gap:10px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch}
+  .gallery img{height:150px;border-radius:13px;border:1px solid var(--line);cursor:pointer;flex:0 0 auto;object-fit:cover}
+  .pdfcard{position:relative;height:150px;width:116px;flex:0 0 auto;border-radius:13px;border:1px solid var(--line);background:var(--card2) center/cover no-repeat;cursor:pointer;overflow:hidden}
+  .pdfcard .lbl{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);color:#fff;font-size:11px;font-weight:600;padding:5px 7px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pdfcard .lbl small{display:block;font-weight:500;opacity:.8}
+  .pdfcard .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.5}
+  .inforow{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+  .inforow .k{color:var(--muted);flex:0 0 auto}
+  .inforow .v{text-align:right;word-break:break-word}
+  .block{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px}
+  .block h4{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+
+  /* Warranty reminders */
+  .remind{background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.3);border-radius:14px;padding:10px 12px 4px;margin-bottom:14px}
+  .remind h4{margin:0 0 2px;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--warn)}
+  .remind .ritem{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:14.5px;cursor:pointer}
+  .remind .ritem+.ritem{border-top:1px solid var(--line)}
+  .remind .ritem .t{flex:1;min-width:0;font-weight:600}
+  .remind .ritem .t small{display:block;color:var(--muted);font-size:12.5px;font-weight:500}
+  .remind .ritem .x{background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;padding:4px 6px}
+
+  /* Chat */
+  .chat{display:flex;flex-direction:column;gap:12px;padding-bottom:10px}
+  .bubble{max-width:88%;padding:12px 14px;border-radius:16px;font-size:15px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
+  .bubble.me{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:5px}
+  .bubble.ai{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:5px}
+  .bubble.ai strong{color:var(--text)}
+  .bubble .imgs{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .bubble .imgs img{width:60px;height:60px;object-fit:cover;border-radius:8px}
+  .cite{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:650;padding:2px 8px;margin:0 2px;border-radius:999px;border:1px solid rgba(79,140,255,.45);background:rgba(79,140,255,.12);color:var(--accent);cursor:pointer;vertical-align:baseline;font-family:inherit;line-height:1.3;white-space:nowrap}
+  .cite:active{transform:scale(.96)}
+  .typing{display:inline-flex;gap:4px;align-items:center}
+  .typing i{width:7px;height:7px;background:var(--muted);border-radius:50%;animation:blink 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+
+  .askbar{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom));padding:8px 12px;background:linear-gradient(0deg,var(--bg) 70%,transparent);display:flex;gap:8px;align-items:flex-end;z-index:15}
+  .askbar textarea{min-height:46px;max-height:120px;border-radius:22px;padding:12px 16px}
+  .askbar .iconbtn{flex:0 0 auto}
+  .iconbtn{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .iconbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .iconbtn:disabled{opacity:.45}
+
+  /* Bottom nav */
+  nav.tab{
+    position:fixed;left:0;right:0;bottom:0;z-index:30;
+    display:flex;background:var(--bg2);border-top:1px solid var(--line);
+    padding-bottom:env(safe-area-inset-bottom)
+  }
+  nav.tab button{
+    flex:1;background:none;border:none;color:var(--muted2);padding:9px 0 8px;
+    font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer
+  }
+  nav.tab button .ic{font-size:21px;line-height:1}
+  nav.tab button.active{color:var(--accent)}
+  nav.tab button.fab .ic{width:40px;height:40px;margin-top:-14px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 6px 18px rgba(79,140,255,.5)}
+  nav.tab button.fab{color:var(--accent)}
+
+  /* Toast + modal */
+  #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);color:var(--text);padding:11px 16px;border-radius:12px;font-size:14px;box-shadow:var(--shadow);z-index:90;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;max-width:90%;text-align:center}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+  #toast.err{border-color:var(--danger);color:#ffd7db}
+  #toast.ok{border-color:var(--ok)}
+
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:80;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px}
+  .lightbox.show{display:flex}
+  .lightbox img{max-width:100%;max-height:82vh;border-radius:12px}
+  .lightbox .close{position:absolute;top:calc(env(safe-area-inset-top) + 12px);right:16px;font-size:26px;color:#fff;background:rgba(255,255,255,.14);border:none;width:42px;height:42px;border-radius:50%;cursor:pointer;z-index:2}
+  .lightbox .pdfwrap{display:none;max-width:100%;max-height:74vh;overflow:auto;border-radius:12px;background:#fff;-webkit-overflow-scrolling:touch}
+  .lightbox .pdfwrap canvas{display:block}
+  .lightbox.pdf .pdfwrap{display:block}
+  .lightbox.pdf #lightboxImg{display:none}
+  .lightbox .cap{color:#fff;opacity:.85;font-size:13px;margin-top:10px;text-align:center;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lightbox .bar{display:none;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;justify-content:center}
+  .lightbox.pdf .bar{display:flex}
+  .lightbox .bar button,.lightbox .bar a{background:rgba(255,255,255,.14);border:none;color:#fff;border-radius:10px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;font-family:inherit}
+  .lightbox .bar button:disabled{opacity:.35}
+  .lightbox .bar span{color:#fff;font-size:14px;min-width:96px;text-align:center}
+
+  /* Bottom sheet */
+  .sheetbg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;display:none;align-items:flex-end;justify-content:center}
+  .sheetbg.show{display:flex}
+  .sheet{position:relative;background:var(--bg2);border:1px solid var(--line);border-bottom:none;border-radius:22px 22px 0 0;width:100%;max-width:640px;max-height:88dvh;overflow-y:auto;padding:10px 16px calc(20px + env(safe-area-inset-bottom));animation:up .22s ease}
+  @keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+  .sheet .handle{width:38px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px}
+  .sheet h3{margin:0 0 4px;font-size:18px}
+  .sheet h5{margin:16px 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+  .chips .pill{color:var(--accent);cursor:pointer}
+  .linkrow{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .linkrow .t{flex:1;min-width:0}
+  .linkrow .t b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .linkrow .t small{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .linkrow .acts{display:flex;gap:6px;flex:0 0 auto}
+  .linkrow .acts .btn.sm{padding:7px 9px;font-size:13px}
+  .gsug{width:100%;height:72px;border:0;margin-top:12px;background:transparent}
+
+  .spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+  .spinner.dark{border-color:rgba(120,140,180,.3);border-top-color:var(--accent)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .note{font-size:12.5px;color:var(--muted);line-height:1.55}
+  .note.warn{color:var(--warn)}
+  .banner{background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.3);color:var(--text);border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.5;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
+  .banner .x{margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;flex:0 0 auto}
+  details.help{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:2px 14px;margin-top:10px}
+  details.help summary{padding:12px 0;font-weight:650;cursor:pointer;font-size:14px}
+  details.help ol{margin:0 0 12px;padding-left:20px;font-size:13.5px;color:var(--muted);line-height:1.7}
+  details.help code{background:var(--card2);padding:1px 6px;border-radius:5px;font-size:12.5px;color:var(--text);word-break:break-all}
+  .divider{height:1px;background:var(--line);margin:18px 0}
+  .searchbar{margin-bottom:14px;position:relative}
+  .searchbar input{padding-left:40px}
+  .searchbar .si{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px}
+</style>
+</head>
+<body>
+<header class="app">
+  <svg class="logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#4f8cff"/><path d="M28 26h32a8 8 0 0 1 8 8v40H36a8 8 0 0 1-8-8V26z" fill="#fff" opacity=".95"/><path d="M60 26h12v40a8 8 0 0 1-8 8h-4V26z" fill="#fff" opacity=".7"/></svg>
+  <h1>DeviceVault</h1>
+  <span id="syncPill" class="pill"><span class="dot"></span><span id="syncTxt">Local</span></span>
+</header>
+
+<main id="view"></main>
+
+<nav class="tab" id="tabs">
+  <button data-tab="devices" class="active"><span class="ic">🗄️</span>Devices</button>
+  <button data-tab="ask"><span class="ic">💬</span>Ask</button>
+  <button data-tab="add" class="fab"><span class="ic">＋</span></button>
+  <button data-tab="identify"><span class="ic">📷</span>Identify</button>
+  <button data-tab="settings"><span class="ic">⚙️</span>Settings</button>
+</nav>
+
+<div id="toast"></div>
+<div class="lightbox" id="lightbox">
+  <button class="close" onclick="closeLightbox()">✕</button>
+  <img id="lightboxImg" alt=""/>
+  <div class="pdfwrap" id="pdfWrap"><canvas id="pdfCanvas"></canvas></div>
+  <div class="cap" id="lbCap"></div>
+  <div class="bar"><button id="pdfPrev" onclick="pdfNav(-1)">‹ Prev</button><span id="pdfPos"></span><button id="pdfNext" onclick="pdfNav(1)">Next ›</button><a id="pdfOpen" target="_blank" rel="noopener">Open ↗</a></div>
+</div>
+<div class="sheetbg" id="sheetbg"><div class="sheet" id="sheet"></div></div>
+
+<!-- hidden global file inputs -->
+<input type="file" id="filePick" accept="image/*" multiple />
+<input type="file" id="filePickCam" accept="image/*" capture="environment" multiple />
+<input type="file" id="filePickPdf" accept="application/pdf,.pdf" multiple />
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+"use strict";
+/* ============================================================
+   DeviceVault — offline-first manual manager
+   Storage: IndexedDB (local) + optional Google Drive sync
+   AI: Google Gemini (vision, JSON output, Google Search grounding)
+       with the user's own key
+   PDF: rendered with pdf.js, loaded on demand from cdnjs (bundled in the Android app)
+   Android: the same file runs inside a WebView shell (android/) that exposes window.Android
+   ============================================================ */
+
+/* ---------- tiny helpers ---------- */
+const $ = (s,r=document)=>r.querySelector(s);
+const view = $('#view');
+const uuid = ()=> (crypto.randomUUID ? crypto.randomUUID() :
+  'xxxxxxxxyxxxx4xxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='y'?(r&3|8):r).toString(16)}));
+const esc = s => (s==null?'':String(s)).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const now = ()=> Date.now();
+function toast(msg,type='',ms=0){const t=$('#toast');t.textContent=msg;t.className='show '+type;clearTimeout(t._t);t._t=setTimeout(()=>t.className=t.className.replace('show','').trim(),ms||(type==='err'?4200:2600));}
+
+function blobToBase64(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(blob);});}
+function blobToDataURL(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob);});}
+
+/* ---------- Android app shell ----------
+   window.Android exists only inside the DeviceVault Android app (android/ folder). In a browser
+   NATIVE is null and everything below falls back to normal web behaviour. */
+const NATIVE = (typeof window.Android==='object' && window.Android && typeof window.Android.fileBegin==='function') ? window.Android : null;
+function openExternal(url){ if(NATIVE) NATIVE.openUrl(url); else window.open(url,'_blank','noopener'); }
+/* Same-origin gateway offered by the Android shell (MainActivity.proxyFetch): GET any https URL
+   without the browser's CORS limits — used for web search results and PDF downloads from sites
+   that block cross-origin reads. null in a browser. */
+const PROXY = NATIVE ? (u => new URL('/proxy/?u=' + encodeURIComponent(u), location.href).href) : null;
+async function nativeSendBlob(blob,name,action){
+  const CHUNK=3*1024*1024;
+  NATIVE.fileBegin(name, blob.type||'application/octet-stream', action);
+  for(let off=0; off<blob.size; off+=CHUNK) NATIVE.fileChunk(await blobToBase64(blob.slice(off, off+CHUNK)));
+  NATIVE.fileEnd();
+}
+/* save a generated file: the system "save as" picker in the app, a download in the browser */
+async function saveFile(blob,name){
+  if(NATIVE){ await nativeSendBlob(blob,name,'save'); return; }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+/* hand a file to another app (calendar, PDF viewer); resolves false outside the Android app */
+async function openWithApp(blob,name){ if(!NATIVE) return false; await nativeSendBlob(blob,name,'open'); return true; }
+/* Android back button / back gesture: close overlays and sub-screens first; false = leave the app */
+window.dvBack=()=>{
+  if($('#lightbox').classList.contains('show')){ closeLightbox(); return true; }
+  if($('#sheetbg').classList.contains('show')){ closeSheet(); return true; }
+  if(state.tab==='devices' && !$('#dlist')){ render(); return true; }
+  if(state.tab==='ask' && state._askDevice){ state._askDevice=null; render(); return true; }
+  if(state.tab!=='devices'){ setTab('devices'); return true; }
+  return false;
+};
+
+const CATS=['Kitchen','Laundry','Climate','Cleaning','Electronics','Power tools','Garden','Bathroom','Other'];
+const MAX_PAGE_IMAGES=16;               // photographed pages sent with each question
+const MAX_PDF_BYTES=50*1024*1024;       // Gemini's per-document limit (50 MB / 1000 pages)
+const INLINE_BUDGET=95*1024*1024;       // total base64 payload allowed per request
+const isPdf = im => !!im && im.type==='pdf';
+const isImage = im => !!im && im.type!=='pdf';
+function fmtBytes(n){ n=+n||0; return n>=1048576 ? (n/1048576).toFixed(1)+' MB' : Math.max(1,Math.round(n/1024))+' KB'; }
+function shortName(name,max=18){ let s=(name||'PDF').replace(/\.pdf$/i,''); if(s.length>max) s=s.slice(0,max-1)+'…'; return s; }
+
+/* ---------- dates (local calendar days, YYYY-MM-DD) ---------- */
+const pad2=n=>String(n).padStart(2,'0');
+const toISO=d=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+const todayISO=()=>toISO(new Date());
+function parseISO(iso){ const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||''); return m? new Date(+m[1],+m[2]-1,+m[3]) : null; }
+function addDaysISO(iso,days){ const d=parseISO(iso); if(!d) return iso; d.setDate(d.getDate()+days); return toISO(d); }
+function addMonthsISO(iso,months){
+  const d=parseISO(iso); if(!d) return iso;
+  const day=d.getDate(); d.setDate(1); d.setMonth(d.getMonth()+months);
+  const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate(); d.setDate(Math.min(day,last));
+  return toISO(d);
+}
+function daysUntil(iso){ const d=parseISO(iso); if(!d) return NaN; return Math.round((d-parseISO(todayISO()))/86400000); }
+function fmtDate(iso){ const d=parseISO(iso); return d? d.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}) : (iso||''); }
+
+/* ---------- image compression ---------- */
+function loadImage(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});}
+async function processImage(file, maxDim=1600, quality=0.82){
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await loadImage(url);
+    const scale = Math.min(1, maxDim/Math.max(img.width,img.height));
+    const w=Math.round(img.width*scale), h=Math.round(img.height*scale);
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    const full = await new Promise(r=>c.toBlob(r,'image/jpeg',quality));
+    // thumbnail
+    const ts=Math.min(1, 360/Math.max(w,h));
+    const tc=document.createElement('canvas');tc.width=Math.round(w*ts);tc.height=Math.round(h*ts);
+    tc.getContext('2d').drawImage(img,0,0,tc.width,tc.height);
+    const thumb = tc.toDataURL('image/jpeg',0.6);
+    return {full, thumb};
+  } finally { URL.revokeObjectURL(url); }
+}
+
+/* ============================================================
+   IndexedDB
+   ============================================================ */
+const DB = (()=>{
+  let db;
+  function open(){
+    return new Promise((res,rej)=>{
+      const rq = indexedDB.open('devicevault',1);
+      rq.onupgradeneeded = e=>{
+        const d=e.target.result;
+        if(!d.objectStoreNames.contains('kv')) d.createObjectStore('kv');
+        if(!d.objectStoreNames.contains('blobs')) d.createObjectStore('blobs');
+      };
+      rq.onsuccess=()=>{db=rq.result;res();};
+      rq.onerror=()=>rej(rq.error);
+    });
+  }
+  const tx=(store,mode)=>db.transaction(store,mode).objectStore(store);
+  const p=req=>new Promise((res,rej)=>{req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);});
+  return {
+    open,
+    kvGet:k=>p(tx('kv','readonly').get(k)),
+    kvSet:(k,v)=>p(tx('kv','readwrite').put(v,k)),
+    blobGet:k=>p(tx('blobs','readonly').get(k)),
+    blobSet:(k,v)=>p(tx('blobs','readwrite').put(v,k)),
+    blobDel:k=>p(tx('blobs','readwrite').delete(k)),
+  };
+})();
+
+/* ============================================================
+   App state
+   ============================================================ */
+const state = {
+  devices: [],
+  settings: {
+    geminiKey:'', geminiModel:'gemini-3.8-flash',
+    geminiLadder:['gemini-3.6-flash','gemini-3.5-flash-lite','gemini-2.5-flash','gemini-2.5-flash-lite'],
+    googleClientId:'', driveFolderId:'', driveConnected:false,
+    warrantyLeadDays:30
+  },
+  tab:'devices',
+  objUrls:{} // imageId -> objectURL cache
+};
+
+function loadSettings(){
+  try{const s=JSON.parse(localStorage.getItem('dv_settings')||'{}');Object.assign(state.settings,s);}catch(e){}
+}
+function saveSettings(){localStorage.setItem('dv_settings',JSON.stringify(state.settings));updateSyncPill();}
+
+async function loadDevices(){ state.devices = (await DB.kvGet('devices'))||[]; }
+async function persistDevices(){ await DB.kvSet('devices', state.devices); if(state.settings.driveConnected) scheduleSync(); }
+
+function getDevice(id){return state.devices.find(d=>d.id===id);}
+
+/* resolve a stored file (photo, manual page or PDF) -> Blob: local cache, else Drive */
+async function getBlob(im){
+  if(!im) return null;
+  let blob = await DB.blobGet(im.id);
+  if(!blob && im.driveId && state.settings.driveConnected){
+    try{ blob = await Drive.download(im.driveId); if(blob) await DB.blobSet(im.id, blob); }catch(e){}
+  }
+  if(blob && isPdf(im) && blob.type!=='application/pdf') blob = new Blob([blob],{type:'application/pdf'});
+  return blob||null;
+}
+/* resolve an image object -> displayable URL (blob cache, else drive, else thumb) */
+async function imgUrl(im){
+  if(!im) return '';
+  if(state.objUrls[im.id]) return state.objUrls[im.id];
+  const blob = await getBlob(im);
+  if(blob){ const u=URL.createObjectURL(blob); state.objUrls[im.id]=u; return u; }
+  return im.thumb || '';
+}
+
+/* ============================================================
+   Google Drive (drive.file scope) via GIS token client
+   ============================================================ */
+const Drive = (()=>{
+  let tokenClient=null, accessToken='', expiry=0;
+  const FOLDER='DeviceVault';
+  function ready(){ return !!NATIVE || !!(window.google && google.accounts && google.accounts.oauth2); }
+  function init(){
+    if(NATIVE || tokenClient) return true;
+    if(!ready() || !state.settings.googleClientId) return false;
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: state.settings.googleClientId,
+      scope:'https://www.googleapis.com/auth/drive.file',
+      callback:()=>{}
+    });
+    return true;
+  }
+  /* inside the Android app the token comes from Google Play services (android/…/DriveAuth.kt) */
+  let nativeSeq=0; const nativeWaiters={};
+  window.__onNativeDriveToken=(id,token,error)=>{
+    const w=nativeWaiters[id]; if(!w) return; delete nativeWaiters[id];
+    if(error||!token) return w.rej(new Error(error||'No access token'));
+    accessToken=token; expiry=now()+50*60*1000; w.res(token);
+  };
+  function getToken(interactive){
+    return new Promise((res,rej)=>{
+      if(accessToken && now() < expiry-60000) return res(accessToken);
+      if(NATIVE){ const id=++nativeSeq; nativeWaiters[id]={res,rej}; NATIVE.requestDriveToken(id, !!interactive); return; }
+      if(!init()) return rej(new Error('Set your Google Client ID in Settings first.'));
+      tokenClient.callback = resp=>{
+        if(resp && resp.error) return rej(new Error(resp.error_description||resp.error));
+        accessToken = resp.access_token;
+        expiry = now() + (resp.expires_in||3600)*1000;
+        res(accessToken);
+      };
+      try{ tokenClient.requestAccessToken({prompt: interactive?'':''}); }
+      catch(e){ rej(e); }
+    });
+  }
+  async function api(url,opts={}){
+    const tk = await getToken(false);
+    const r = await fetch(url,{...opts, headers:{Authorization:`Bearer ${tk}`, ...(opts.headers||{})}});
+    if(r.status===401){ accessToken=''; const tk2=await getToken(true); const r2=await fetch(url,{...opts,headers:{Authorization:`Bearer ${tk2}`,...(opts.headers||{})}}); return r2; }
+    return r;
+  }
+  async function ensureFolder(){
+    if(state.settings.driveFolderId) return state.settings.driveFolderId;
+    const q = encodeURIComponent(`mimeType='application/vnd.google-apps.folder' and name='${FOLDER}' and trashed=false`);
+    let r = await api(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)&spaces=drive`);
+    let j = await r.json();
+    if(j.files && j.files.length){ state.settings.driveFolderId=j.files[0].id; }
+    else{
+      r = await api('https://www.googleapis.com/drive/v3/files?fields=id',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:FOLDER,mimeType:'application/vnd.google-apps.folder'})});
+      j = await r.json(); state.settings.driveFolderId=j.id;
+    }
+    saveSettings();
+    return state.settings.driveFolderId;
+  }
+  async function uploadMultipart(blob, name, mime, existingId){
+    const folder = await ensureFolder();
+    const meta = existingId ? {name} : {name, parents:[folder], mimeType:mime};
+    const b64 = await blobToBase64(blob);
+    const boundary='dvb_'+uuid().slice(0,12);
+    const body =
+      `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n`+
+      JSON.stringify(meta)+`\r\n`+
+      `--${boundary}\r\nContent-Type: ${mime}\r\nContent-Transfer-Encoding: base64\r\n\r\n`+
+      b64+`\r\n--${boundary}--`;
+    const base = existingId
+      ? `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart&fields=id`
+      : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id`;
+    const r = await api(base,{method: existingId?'PATCH':'POST', headers:{'Content-Type':`multipart/related; boundary=${boundary}`}, body});
+    if(!r.ok) throw new Error('Drive upload failed ('+r.status+')');
+    return (await r.json()).id;
+  }
+  async function download(fileId){
+    const r = await api(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+    if(!r.ok) throw new Error('Drive download failed');
+    return await r.blob();
+  }
+  async function findFile(name){
+    const folder = await ensureFolder();
+    const q = encodeURIComponent(`name='${name}' and '${folder}' in parents and trashed=false`);
+    const r = await api(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`);
+    const j = await r.json();
+    return (j.files&&j.files[0])||null;
+  }
+  return {
+    ready, init, getToken, ensureFolder, download, findFile,
+    uploadBlob:(blob,name,mime)=>uploadMultipart(blob,name,mime),
+    uploadImage:(blob,name)=>uploadMultipart(blob,name,'image/jpeg'),
+    uploadJson:(name,obj,id)=>uploadMultipart(new Blob([JSON.stringify(obj)],{type:'application/json'}),name,'application/json',id),
+    reset(){accessToken='';expiry=0;tokenClient=null;}
+  };
+})();
+
+/* connect / sync orchestration */
+async function connectDrive(){
+  if(!NATIVE && !state.settings.googleClientId){ toast('Enter your Google Client ID first','err'); return; }
+  if(!Drive.ready()){ toast('Google library still loading, try again','err'); return; }
+  try{
+    setSyncPill('warn','Connecting…');
+    await Drive.getToken(true);
+    await Drive.ensureFolder();
+    state.settings.driveConnected=true; saveSettings();
+    toast('Google Drive connected','ok');
+    await pullFromDrive(true);
+    render();
+  }catch(e){ state.settings.driveConnected=false; saveSettings(); toast('Drive: '+e.message,'err'); updateSyncPill(); }
+}
+function disconnectDrive(){
+  state.settings.driveConnected=false; Drive.reset(); saveSettings(); updateSyncPill();
+  toast('Disconnected (local data kept)');
+}
+
+let syncTimer=null, syncing=false;
+function scheduleSync(){ clearTimeout(syncTimer); syncTimer=setTimeout(()=>syncToDrive(),1200); }
+async function syncToDrive(){
+  if(!state.settings.driveConnected || syncing) return;
+  syncing=true; setSyncPill('warn','Syncing…');
+  try{
+    // upload any files lacking a driveId (photos, manual pages, PDFs)
+    for(const d of state.devices){
+      for(const im of [...(d.photos||[]),...(d.manuals||[])]){
+        if(!im.driveId){
+          const blob = await DB.blobGet(im.id);
+          if(blob){
+            try{
+              im.driveId = isPdf(im)
+                ? await Drive.uploadBlob(blob, im.id+'.pdf', 'application/pdf')
+                : await Drive.uploadImage(blob, im.id+'.jpg');
+            }catch(e){ console.warn('file upload',e); }
+          }
+        }
+      }
+    }
+    // upload index (blobs live separately)
+    const existing = await Drive.findFile('devices.json');
+    await Drive.uploadJson('devices.json', {v:1, updatedAt:now(), devices:state.devices}, existing&&existing.id);
+    await DB.kvSet('devices', state.devices); // keep driveIds locally
+    updateSyncPill();
+    setSyncPill('on','Synced');
+    setTimeout(updateSyncPill,1500);
+  }catch(e){ console.warn(e); toast('Sync issue: '+e.message,'err'); updateSyncPill(); }
+  finally{ syncing=false; }
+}
+async function pullFromDrive(silent){
+  if(!state.settings.driveConnected) return;
+  try{
+    const f = await Drive.findFile('devices.json');
+    if(!f){ if(!silent) toast('No cloud data yet'); return; }
+    const blob = await Drive.download(f.id);
+    const data = JSON.parse(await blob.text());
+    const remote = data.devices||[];
+    // merge by id, newest updatedAt wins
+    const map = new Map(state.devices.map(d=>[d.id,d]));
+    for(const rd of remote){
+      const local = map.get(rd.id);
+      if(!local || (rd.updatedAt||0) >= (local.updatedAt||0)) map.set(rd.id, rd);
+    }
+    state.devices = [...map.values()].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+    await DB.kvSet('devices', state.devices);
+    if(!silent) toast('Restored from Drive','ok');
+  }catch(e){ console.warn(e); if(!silent) toast('Restore failed: '+e.message,'err'); }
+}
+
+/* ============================================================
+   Gemini
+   ============================================================ */
+const Gemini = (()=>{
+  const BASE='https://generativelanguage.googleapis.com/v1beta';
+  async function listModels(key){
+    const r = await fetch(`${BASE}/models?key=${key}`);
+    if(!r.ok) throw new Error('Bad API key or network ('+r.status+')');
+    const j = await r.json();
+    return (j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent'))
+      .map(m=>m.name.replace('models/','')).filter(n=>/gemini/i.test(n));
+  }
+  /* ---- Model ladder ----
+     Every request is tried on the chosen model first and then on the fallback models from Settings,
+     whenever the failure is about the model rather than the request (over quota, not found, overloaded,
+     feature not supported). A model that failed is rested for a while, separately for plain requests
+     and for requests that use Google Search: on a free key, Search grounding is only available on the
+     2.5 Flash models, so a Gemini 3 model can answer questions while 2.5 Flash does the searching. */
+  const DEFAULT_LADDER=['gemini-3.8-flash','gemini-3.6-flash','gemini-3.5-flash-lite','gemini-2.5-flash','gemini-2.5-flash-lite'];
+  let cooldown={}; try{ cooldown=JSON.parse(localStorage.getItem('dv_model_cooldown')||'{}'); }catch(e){}
+  const rest=(model,kind,ms,why)=>{ cooldown[model+'|'+kind]={until:Date.now()+ms, why}; try{ localStorage.setItem('dv_model_cooldown',JSON.stringify(cooldown)); }catch(e){} };
+  const resting=(model,kind)=>{ const c=cooldown[model+'|'+kind]; return c && c.until>Date.now() ? c : null; };
+  function ladder(primary){
+    const extra=Array.isArray(state.settings.geminiLadder)?state.settings.geminiLadder:[];
+    return [primary,...extra].map(m=>String(m||'').trim()).filter((m,i,a)=>m && a.indexOf(m)===i);
+  }
+  /* Turns a non-OK response into an Error with .status, .retryable (try the next model) and a short reason. */
+  function apiError(j,status,model,grounded){
+    const e=(j&&j.error)||{}; let msg=e.message||('Gemini error '+status);
+    const quotas=[]; let retryMs=0;
+    for(const d of (e.details||[])){
+      for(const v of (d.violations||[])){ const q=v.quotaId||v.quotaMetric; if(q) quotas.push(q+(v.quotaValue!=null?' (limit '+v.quotaValue+')':'')); }
+      if(d.retryDelay){ const s=parseFloat(d.retryDelay); if(s>0) retryMs=s*1000; }
+    }
+    msg=msg.replace(/\s*For more information on this error.*$/s,'').trim();
+    let short='', retryable=false, restMs=0;
+    if(status===429){
+      retryable=true; short='over quota';
+      restMs = quotas.some(q=>/PerDay|Daily/i.test(q)) ? 6*3600e3 : (grounded ? 6*3600e3 : Math.max(retryMs, 90e3));
+      if(grounded && /gemini-3/.test(model)) msg+=' — Google Search grounding has no free quota on Gemini 3 models (it needs a billed project); the 2.5 Flash models get 500 free searches a day.';
+      if(quotas.length) msg+=' Quota: '+quotas.join(', ')+'.';
+    }else if(status===404){ retryable=true; short='not found'; restMs=24*3600e3; msg=msg.replace(/\s*(Please update your code|We recommend you).*$/s,''); }
+    else if(status===503||status===500){ retryable=true; short='overloaded'; restMs=Math.max(retryMs,60e3); }
+    else if(status===400 && /not supported|unsupported|not available|does not support/i.test(msg)){ retryable=true; short='not supported'; restMs=24*3600e3; }
+    const err=new Error(msg); err.status=status; err.retryable=retryable; err.short=short||('error '+status); err.restMs=restMs; err.model=model;
+    return err;
+  }
+  async function callOnce({key,model,parts,history=[],json=null,tools=null,temperature=0.4,maxOutputTokens=8192}){
+    const generationConfig={maxOutputTokens};
+    if(temperature!=null) generationConfig.temperature=temperature;
+    if(json){ generationConfig.responseMimeType='application/json'; if(json.schema) generationConfig.responseSchema=json.schema; }
+    const body={contents:[...history,{role:'user',parts}], generationConfig};
+    if(tools) body.tools=tools;
+    const r = await fetch(`${BASE}/models/${model}:generateContent?key=${key}`,{
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+    });
+    let j={}; try{ j=await r.json(); }catch(e){}
+    if(!r.ok) throw apiError(j, r.status, model, !!tools);
+    const cand = j.candidates && j.candidates[0];
+    if(!cand) throw new Error('No response (content may have been blocked).');
+    const text=(cand.content?.parts||[]).filter(p=>!p.thought).map(p=>p.text||'').join('').trim();
+    if(!text && cand.finishReason==='MAX_TOKENS') throw new Error('The response was cut off (token limit). Try a shorter question.');
+    return {text: text||'(empty response)', candidate:cand, raw:j};
+  }
+  /* json: {schema} -> structured JSON output; tools: e.g. [{googleSearch:{}}]; temperature:null -> model default.
+     Result also carries .model (which model answered) and .note (why the chosen model was skipped, if it was). */
+  async function generateFull(opts){
+    const kind=opts.tools?'search':'plain';
+    const models=ladder(opts.model); const failed=[]; let lastErr=null;
+    for(let i=0;i<models.length;i++){
+      const m=models[i]; const c=resting(m,kind);
+      if(c && i<models.length-1){ failed.push(m+': '+c.why+' (resting)'); continue; }
+      try{
+        const res=await callOnce({...opts, model:m});
+        res.model=m; res.note = failed.length ? `Answered by ${m}. Skipped ${failed.join('; ')}.` : '';
+        return res;
+      }catch(e){
+        lastErr=e;
+        if(!e.retryable) throw e;
+        rest(m,kind,e.restMs,e.short); failed.push(m+': '+e.short);
+        console.warn('Gemini: '+m+' '+e.short+(kind==='search'?' (with Google Search)':'')+' — '+e.message);
+      }
+    }
+    const err=new Error((models.length>1?'All models failed — ':'')+failed.map(f=>f.replace(/ \(resting\)$/,'')).join('; ')+'. Last error: '+(lastErr?lastErr.message:'?'));
+    err.status=lastErr&&lastErr.status; err.failed=failed; throw err;
+  }
+  const generate = async (opts)=>(await generateFull(opts)).text;
+  const forget=()=>{ cooldown={}; try{ localStorage.removeItem('dv_model_cooldown'); }catch(e){} };
+  return {listModels, generate, generateFull, DEFAULT_LADDER, ladder, forget};
+})();
+
+/* Build the manual context for a question: labelled photographed pages + PDF documents.
+   Page numbers in the labels are what the model cites ([p.N] / [docK p.N]). */
+async function manualContext(d){
+  const parts=[], skipped=[]; let budget=INLINE_BUDGET, pageN=0, docN=0, pagesUsed=0, docsUsed=0;
+  for(const im of (d.manuals||[])){
+    if(isPdf(im)){
+      docN++;
+      const label=im.name||('PDF '+docN);
+      if(im.size>MAX_PDF_BYTES){ skipped.push(`${label} (over Gemini's 50 MB limit)`); continue; }
+      const blob=await getBlob(im);
+      if(!blob){ skipped.push(`${label} (file not available on this device)`); continue; }
+      if(blob.size>MAX_PDF_BYTES){ skipped.push(`${label} (over Gemini's 50 MB limit)`); continue; }
+      const b64=await blobToBase64(blob);
+      if(b64.length>budget){ skipped.push(`${label} (request size limit)`); continue; }
+      budget-=b64.length;
+      parts.push({text:`PDF document ${docN}${im.name?` ("${im.name}")`:''}${im.pages?`, ${im.pages} pages`:''}:`});
+      parts.push({inline_data:{mime_type:'application/pdf', data:b64}});
+      docsUsed++;
+    }else{
+      pageN++;
+      if(pagesUsed>=MAX_PAGE_IMAGES){ skipped.push(`page ${pageN} (max ${MAX_PAGE_IMAGES} photographed pages per question)`); continue; }
+      const blob=await getBlob(im);
+      if(!blob){ skipped.push(`page ${pageN} (file not available on this device)`); continue; }
+      const b64=await blobToBase64(blob);
+      if(b64.length>budget){ skipped.push(`page ${pageN} (request size limit)`); continue; }
+      budget-=b64.length;
+      parts.push({text:`Manual page ${pageN}:`});
+      parts.push({inline_data:{mime_type:'image/jpeg', data:b64}});
+      pagesUsed++;
+    }
+  }
+  return {parts, skipped, pagesUsed, docsUsed};
+}
+function manualSummary(d){
+  const items=d.manuals||[]; const imgs=items.filter(isImage).length; const pdfs=items.filter(isPdf);
+  const pdfPages=pdfs.reduce((a,p)=>a+(p.pages||0),0); const bits=[];
+  if(imgs) bits.push(`${imgs} photographed page${imgs>1?'s':''}`);
+  if(pdfs.length) bits.push(`${pdfs.length} PDF${pdfs.length>1?'s':''}${pdfPages?` (${pdfPages} page${pdfPages>1?'s':''})`:''}`);
+  return bits.join(' + ');
+}
+
+/* ============================================================
+   pdf.js (loaded on demand) — thumbnails, page count, page rendering
+   ============================================================ */
+const PdfJs = (()=>{
+  const BASE = NATIVE ? './pdfjs/' : 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/';
+  let lib=null; const docs={};
+  async function load(){
+    if(lib) return lib;
+    const m = await import(BASE+'pdf.min.mjs');
+    m.GlobalWorkerOptions.workerSrc = BASE+'pdf.worker.min.mjs';
+    lib=m; return lib;
+  }
+  async function open(blob){ const pdfjs=await load(); return pdfjs.getDocument({data: await blob.arrayBuffer()}).promise; }
+  async function doc(im){
+    if(docs[im.id]) return docs[im.id];
+    const blob=await getBlob(im); if(!blob) throw new Error('PDF file not available on this device');
+    const d=await open(blob); docs[im.id]=d; return d;
+  }
+  async function renderPage(doc,pageNo,canvas,targetW,dpr=1){
+    const page=await doc.getPage(pageNo);
+    const v1=page.getViewport({scale:1});
+    const vp=page.getViewport({scale:(targetW/v1.width)*dpr});
+    canvas.width=Math.round(vp.width); canvas.height=Math.round(vp.height);
+    canvas.style.width=Math.round(vp.width/dpr)+'px'; canvas.style.height=Math.round(vp.height/dpr)+'px';
+    await page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise;
+  }
+  async function meta(blob){
+    const d=await open(blob);
+    const c=document.createElement('canvas');
+    await renderPage(d,1,c,260,1);
+    const out={pages:d.numPages, thumb:c.toDataURL('image/jpeg',0.6)};
+    try{ await d.destroy(); }catch(e){}
+    return out;
+  }
+  function forget(id){ const d=docs[id]; if(d){ delete docs[id]; try{ d.destroy(); }catch(e){} } }
+  return {load, doc, renderPage, meta, forget};
+})();
+
+async function looksLikePdf(blob){
+  try{ const head=await blob.slice(0,1024).text(); return head.includes('%PDF'); }catch(e){ return false; }
+}
+/* create a manual item from a PDF blob (stores the blob, renders a thumbnail, counts pages) */
+async function makePdfItem(blob, name){
+  if(!(await looksLikePdf(blob))) throw new Error('not a PDF file');
+  const im={id:uuid(), type:'pdf', name:(name||'manual.pdf').replace(/[\[\]|]/g,'').slice(0,80), size:blob.size, pages:0, thumb:'', driveId:null};
+  const pdfBlob = blob.type==='application/pdf' ? blob : new Blob([blob],{type:'application/pdf'});
+  try{ const m=await PdfJs.meta(pdfBlob); im.pages=m.pages; im.thumb=m.thumb; }
+  catch(e){ console.warn('pdf preview failed',e); }
+  await DB.blobSet(im.id, pdfBlob);
+  if(blob.size>MAX_PDF_BYTES) toast(`${im.name} is ${fmtBytes(blob.size)} — Gemini reads PDFs up to 50 MB, so this one can be viewed but not used for answers. Try a compressed copy.`,'err');
+  return im;
+}
+
+/* ============================================================
+   Rendering
+   ============================================================ */
+function updateSyncPill(){
+  const p=$('#syncPill');
+  if(state.settings.driveConnected){ p.className='pill on'; $('#syncTxt').textContent='Drive'; }
+  else { p.className='pill'; $('#syncTxt').textContent='Local'; }
+}
+function setSyncPill(cls,txt){ const p=$('#syncPill'); p.className='pill '+cls; $('#syncTxt').textContent=txt; }
+
+function setTab(t){ state.tab=t; [...$('#tabs').children].forEach(b=>b.classList.toggle('active',b.dataset.tab===t)); render(); }
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setTab(b.dataset.tab);});
+
+function render(){
+  const t=state.tab;
+  if(t==='devices') renderDevices();
+  else if(t==='add') renderForm();
+  else if(t==='ask') renderAsk(state._askDevice);
+  else if(t==='identify') renderIdentify();
+  else if(t==='settings') renderSettings();
+}
+
+/* ---- Warranty helpers ---- */
+function warrantyInfo(d){
+  if(!d||!d.warrantyEnd) return null;
+  const days=daysUntil(d.warrantyEnd); if(isNaN(days)) return null;
+  const lead=Math.max(0, parseInt(state.settings.warrantyLeadDays,10)||0);
+  let st, text;
+  if(days<0){ st='expired'; text = days===-1 ? 'expired yesterday' : `expired ${-days} days ago`; }
+  else if(days===0){ st='due'; text='ends today'; }
+  else if(days<=lead){ st='due'; text=`ends in ${days} day${days>1?'s':''}`; }
+  else { st='ok'; text=`${days} days left`; }
+  return {days, lead, state:st, text, date:fmtDate(d.warrantyEnd)};
+}
+function warrantyDue(){
+  return state.devices.filter(d=>{ const w=warrantyInfo(d); return w && d.warrantyAck!==d.warrantyEnd && (w.state==='due' || (w.state==='expired' && w.days>=-7)); });
+}
+/* the calendar event: on the reminder day (lead days before the end), or today if that is already past */
+function warrantyEvent(d){
+  const w=warrantyInfo(d);
+  let day=addDaysISO(d.warrantyEnd, -(w?w.lead:0));
+  if(daysUntil(day)<0) day = daysUntil(d.warrantyEnd)>=0 ? todayISO() : d.warrantyEnd;
+  const title=`Warranty ends ${fmtDate(d.warrantyEnd)}: ${d.name||'device'}`;
+  const details=[
+    [d.name, d.brand, d.model].filter(Boolean).join(' · '),
+    d.serial?`Serial: ${d.serial}`:'',
+    d.purchaseDate?`Purchased: ${fmtDate(d.purchaseDate)}`:'',
+    d.purchaseUrl?`Bought from: ${d.purchaseUrl}`:'',
+    `Warranty ends on ${fmtDate(d.warrantyEnd)}. Check it before then if anything is wrong with the device.`,
+    'Reminder created by DeviceVault'
+  ].filter(Boolean).join('\n');
+  return {day, title, details};
+}
+function buildIcs(d){
+  const ev=warrantyEvent(d);
+  const e=s=>String(s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
+  const fold=l=>{ const out=[]; while(l.length>73){ out.push(l.slice(0,73)); l=' '+l.slice(73); } out.push(l); return out.join('\r\n'); };
+  const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+  const ds=ev.day.replace(/-/g,''), de=addDaysISO(ev.day,1).replace(/-/g,'');
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DeviceVault//Warranty reminder//EN','CALSCALE:GREGORIAN','BEGIN:VEVENT',
+    `UID:warranty-${d.id}@devicevault`,`DTSTAMP:${stamp}`,`DTSTART;VALUE=DATE:${ds}`,`DTEND;VALUE=DATE:${de}`,
+    `SUMMARY:${e(ev.title)}`,`DESCRIPTION:${e(ev.details)}`,
+    'BEGIN:VALARM','ACTION:DISPLAY',`DESCRIPTION:${e(ev.title)}`,'TRIGGER:PT9H','END:VALARM',
+    'END:VEVENT','END:VCALENDAR'].map(fold).join('\r\n')+'\r\n';
+}
+window.warrantyToGoogleCal=(id)=>{
+  const d=getDevice(id); if(!d||!d.warrantyEnd) return;
+  const ev=warrantyEvent(d); const ds=ev.day.replace(/-/g,''), de=addDaysISO(ev.day,1).replace(/-/g,'');
+  const u=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(ev.title)}&dates=${ds}/${de}&details=${encodeURIComponent(ev.details)}`;
+  openExternal(u);
+};
+window.warrantyIcs=(id)=>{
+  const d=getDevice(id); if(!d||!d.warrantyEnd) return;
+  const blob=new Blob([buildIcs(d)],{type:'text/calendar'});
+  const name=`warranty-${(d.name||'device').replace(/[^\w-]+/g,'_').slice(0,40)}.ics`;
+  if(NATIVE){ openWithApp(blob,name).catch(e=>toast('Could not open the calendar file: '+e.message,'err')); return; }
+  saveFile(blob,name);
+  toast('Calendar file downloaded — open it to add the reminder','ok');
+};
+window.ackWarranty=async(id)=>{ const d=getDevice(id); if(!d) return; d.warrantyAck=d.warrantyEnd; d.updatedAt=now(); await persistDevices(); drawReminders(); };
+
+/* ---- Devices list ---- */
+async function renderDevices(){
+  view.innerHTML = `<div class="view"><h2 class="section">My Devices</h2>
+    <div id="remindBox"></div>
+    <div class="searchbar"><span class="si">🔎</span><input id="dsearch" placeholder="Search name, brand, model…" /></div>
+    <div id="dlist"></div></div>`;
+  drawReminders();
+  const draw = async (filter='')=>{
+    const list=$('#dlist'); const f=filter.toLowerCase();
+    const items = state.devices.filter(d=>!f || [d.name,d.brand,d.model,d.category,d.serial].some(x=>(x||'').toLowerCase().includes(f)));
+    if(!state.devices.length){
+      list.innerHTML=`<div class="empty"><div class="big">🗄️</div><h3>No devices yet</h3><p>Register your first appliance or gadget — snap a few photos, add its manual, and ask questions any time.</p><button class="btn primary" style="max-width:260px;margin:16px auto 0" onclick="setTab('add')">＋ Register a device</button></div>`;
+      return;
+    }
+    if(!items.length){ list.innerHTML=`<div class="empty"><div class="big">🔍</div><h3>No matches</h3></div>`; return; }
+    list.innerHTML=`<div class="grid">${items.map(d=>{ const w=warrantyInfo(d); return `
+      <div class="dcard" onclick="openDevice('${d.id}')">
+        <div class="thumb" data-thumb="${d.id}">${(d.photos&&d.photos[0])?'':'<span class="ph">📦</span>'}</div>
+        <div class="body">
+          <p class="name">${esc(d.name||'Untitled device')}</p>
+          <p class="meta">${esc([d.brand,d.model].filter(Boolean).join(' · ')||'—')}</p>
+          ${d.category?`<span class="chip">${esc(d.category)}</span>`:''}
+          ${w&&w.state==='due'?`<span class="chip warn">⏳ Warranty: ${w.days===0?'ends today':w.days+' day'+(w.days===1?'':'s')}</span>`:(w&&w.state==='expired'&&w.days>=-30?`<span class="chip muted">Warranty expired</span>`:'')}
+        </div>
+      </div>`;}).join('')}</div>`;
+    for(const d of items){ if(d.photos&&d.photos[0]){ const u=await imgUrl(d.photos[0]); const el=list.querySelector(`[data-thumb="${d.id}"]`); if(el&&u) el.style.backgroundImage=`url("${u}")`; } }
+  };
+  draw();
+  $('#dsearch').addEventListener('input',e=>draw(e.target.value));
+}
+function drawReminders(){
+  const box=$('#remindBox'); if(!box) return;
+  const due=warrantyDue();
+  if(!due.length){ box.innerHTML=''; return; }
+  box.innerHTML=`<div class="remind"><h4>⏰ Warranty reminders</h4>${due.map(d=>{ const w=warrantyInfo(d); return `
+    <div class="ritem" onclick="openDevice('${d.id}')">
+      <div class="t">${esc(d.name||'Untitled device')}<small>Warranty ${esc(w.text)} · ${esc(w.date)}</small></div>
+      <button class="x" title="Dismiss" onclick="event.stopPropagation();ackWarranty('${d.id}')">✕</button>
+    </div>`;}).join('')}</div>`;
+}
+
+window.openDevice = async (id)=>{
+  const d=getDevice(id); if(!d) return;
+  const w=warrantyInfo(d); const manuals=d.manuals||[];
+  view.innerHTML=`<div class="view">
+    <button class="btn ghost sm" style="margin-bottom:8px" onclick="setTab('devices')">‹ Back</button>
+    <h2 class="section" style="margin-top:4px">${esc(d.name||'Untitled device')}</h2>
+    <p class="sub">${esc([d.brand,d.model].filter(Boolean).join(' · '))}</p>
+    <div class="btnrow" style="margin-bottom:16px">
+      <button class="btn primary" onclick="askAbout('${d.id}')">💬 Ask a question</button>
+      <button class="btn sm" style="flex:0 0 auto" onclick="editDevice('${d.id}')">✏️</button>
+    </div>
+    ${d.photos&&d.photos.length?`<div class="block"><h4>Photos</h4><div class="gallery" id="gPhotos"></div></div>`:''}
+    <div class="block"><h4>Manual${manuals.length?` · ${esc(manualSummary(d))}`:''}</h4>
+      ${manuals.length?`<div class="gallery" id="gManuals"></div>`:`<p class="note" style="margin:0 0 10px">No manual yet. Photograph the pages, add the PDF, or find it online.</p>`}
+      <div class="btnrow" style="margin-top:${manuals.length?'6px':'0'}">
+        <button class="btn sm" onclick="editDevice('${d.id}')">➕ Add pages / PDF</button>
+        <button class="btn sm" onclick="findManual('${d.id}')">🔎 Find online</button>
+      </div>
+      ${d.manualUrl?`<div class="inforow" style="border:none;padding-bottom:0"><span class="k">Online manual</span><span class="v"><a href="${esc(d.manualUrl)}" target="_blank" rel="noopener">Open ↗</a></span></div>`:''}
+    </div>
+    ${w?`<div class="block"><h4>Warranty</h4>
+      <p style="margin:0 0 ${w.state==='expired'?'0':'10px'};font-size:14.5px">${w.state==='expired'?'⌛':(w.state==='due'?'⚠️':'✅')} ${esc(w.date)} · ${esc(w.text)}</p>
+      ${w.state!=='expired'?`<p class="note" style="margin:0 0 10px">${warrantyEvent(d).day===todayISO()
+          ? `Add a reminder for today — it ends in ${w.days} day${w.days===1?'':'s'}, less than your ${w.lead}-day lead time (change it in Settings).`
+          : `Add a reminder for ${esc(fmtDate(warrantyEvent(d).day))}, ${w.lead} days before it ends (change the lead time in Settings).`}</p>
+      <div class="btnrow"><button class="btn sm" onclick="warrantyToGoogleCal('${d.id}')">📅 Google Calendar</button><button class="btn sm" onclick="warrantyIcs('${d.id}')">${NATIVE?'📅 Add to calendar':'📅 Download .ics'}</button></div>`:''}
+    </div>`:''}
+    <div class="block"><h4>Details</h4>
+      ${infoRow('Category',d.category)}
+      ${infoRow('Brand',d.brand)}
+      ${infoRow('Model',d.model)}
+      ${infoRow('Serial №',d.serial)}
+      ${infoRow('Purchased',d.purchaseDate?fmtDate(d.purchaseDate):'')}
+      ${d.productUrl?`<div class="inforow"><span class="k">Product page</span><span class="v"><a href="${esc(d.productUrl)}" target="_blank" rel="noopener">Open ↗</a></span></div>`:''}
+      ${d.purchaseUrl?`<div class="inforow"><span class="k">Bought from</span><span class="v"><a href="${esc(d.purchaseUrl)}" target="_blank" rel="noopener">Open ↗</a></span></div>`:''}
+      ${d.notes?`<div style="padding-top:12px;color:var(--muted);font-size:14px;line-height:1.6;white-space:pre-wrap">${esc(d.notes)}</div>`:''}
+    </div>
+    <button class="btn danger" style="margin-top:6px" onclick="deleteDevice('${d.id}')">Delete device</button>
+  </div>`;
+  const g1=$('#gPhotos');
+  if(g1) for(const im of d.photos){ const u=await imgUrl(im); if(!u) continue; const img=document.createElement('img'); img.src=u; img.onclick=()=>openLightbox(u,'Photo'); g1.appendChild(img); }
+  const g2=$('#gManuals');
+  if(g2){ let n=0; for(const im of manuals){
+    if(isPdf(im)){ g2.appendChild(pdfCard(im)); }
+    else { n++; const u=await imgUrl(im); if(!u) continue; const img=document.createElement('img'); img.src=u; const cap='Manual page '+n; img.onclick=()=>openLightbox(u,cap); g2.appendChild(img); }
+  } }
+};
+function pdfCard(im){
+  const div=document.createElement('div'); div.className='pdfcard';
+  if(im.thumb) div.style.backgroundImage=`url("${im.thumb}")`;
+  div.innerHTML=`${im.thumb?'':'<span class="ph">📄</span>'}<span class="lbl">📄 ${esc(shortName(im.name,22))}<small>${im.pages?im.pages+' pages':'PDF'}${im.size?' · '+fmtBytes(im.size):''}</small></span>`;
+  div.onclick=()=>openPdf(im,1);
+  return div;
+}
+function infoRow(k,v){ return v?`<div class="inforow"><span class="k">${k}</span><span class="v">${esc(v)}</span></div>`:''; }
+
+/* ---- Add / Edit form ---- */
+let formDraft=null;
+function renderForm(){
+  const editing = !!(formDraft && formDraft._editing);
+  if(!formDraft) formDraft={ id:uuid(), name:'',brand:'',model:'',category:'',serial:'',purchaseDate:'',warrantyEnd:'',productUrl:'',purchaseUrl:'',manualUrl:'',notes:'', photos:[], manuals:[] };
+  const d=formDraft; d.photos=d.photos||[]; d.manuals=d.manuals||[];
+  view.innerHTML=`<div class="view">
+    <h2 class="section">${editing?'Edit device':'Register a device'}</h2>
+    <div class="block">
+      <h4>Photos of the device</h4>
+      <div class="thumbrow" id="photoRow"></div>
+      <button class="btn sm" id="scanBtn" style="margin-top:12px" onclick="scanLabel()">🏷️ Scan the rating label → fill brand, model, serial</button>
+      <p class="note" style="margin:8px 0 0">Photograph the sticker or plate with the model and serial number. Gemini reads it and fills in the fields below.</p>
+    </div>
+    <div class="field"><label>Name *</label><input id="f_name" placeholder="e.g. Living-room air purifier" value="${esc(d.name)}"/></div>
+    <div class="row2">
+      <div class="field"><label>Brand</label><input id="f_brand" placeholder="Dyson" value="${esc(d.brand)}"/></div>
+      <div class="field"><label>Model</label><input id="f_model" placeholder="TP07" value="${esc(d.model)}"/></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Category</label><input id="f_category" list="cats" placeholder="Appliance" value="${esc(d.category)}"/>
+        <datalist id="cats">${CATS.map(c=>`<option>${c}</option>`).join('')}</datalist></div>
+      <div class="field"><label>Serial №</label><input id="f_serial" placeholder="optional" value="${esc(d.serial)}"/></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Purchase date</label><input id="f_purchaseDate" type="date" value="${esc(d.purchaseDate||'')}"/></div>
+      <div class="field"><label>Warranty ends</label><input id="f_warrantyEnd" type="date" value="${esc(d.warrantyEnd||'')}"/></div>
+    </div>
+    <div class="quick"><span class="note">Warranty:</span>${[1,2,3,5].map(y=>`<button class="btn sm" onclick="setWarranty(${y})">+${y} yr</button>`).join('')}<span class="note">from the purchase date</span></div>
+    <div class="field"><label>Product page URL</label><input id="f_productUrl" inputmode="url" placeholder="https://…" value="${esc(d.productUrl)}"/></div>
+    <div class="field"><label>Where you bought it (URL)</label><input id="f_purchaseUrl" inputmode="url" placeholder="https://store…" value="${esc(d.purchaseUrl)}"/></div>
+    <div class="field"><label>Online manual URL</label><input id="f_manualUrl" inputmode="url" placeholder="https://…/manual.pdf" value="${esc(d.manualUrl||'')}"/></div>
+    <div class="field"><label>Notes</label><textarea id="f_notes" placeholder="Anything useful — filter size, warranty, quirks…">${esc(d.notes)}</textarea></div>
+    <div class="block">
+      <h4>Manual</h4>
+      <p class="note" style="margin:-4px 0 10px">Photograph each page of the paper manual, or add the PDF. These power the AI answers and the page references.</p>
+      <div class="thumbrow" id="manualRow"></div>
+      <button class="btn sm" style="margin-top:12px" onclick="findManualFromForm()">🔎 Find the manual online</button>
+    </div>
+    <div class="btnrow" style="margin-top:6px">
+      ${editing?`<button class="btn" onclick="cancelForm()">Cancel</button>`:''}
+      <button class="btn primary" id="saveBtn" onclick="saveForm()">${editing?'Save changes':'Save device'}</button>
+    </div>
+    <div style="height:20px"></div>
+  </div>`;
+  drawThumbs();
+  ['name','brand','model','category','serial','purchaseDate','warrantyEnd','productUrl','purchaseUrl','manualUrl','notes'].forEach(k=>{
+    const el=$('#f_'+k); if(!el) return;
+    const upd=()=>d[k]=el.value;
+    el.addEventListener('input',upd); el.addEventListener('change',upd);
+  });
+}
+window.setWarranty=(years)=>{
+  if(!formDraft) return;
+  const base=($('#f_purchaseDate')&&$('#f_purchaseDate').value)||formDraft.purchaseDate||'';
+  const end=addMonthsISO(base||todayISO(), years*12);
+  formDraft.warrantyEnd=end; const el=$('#f_warrantyEnd'); if(el) el.value=end;
+  toast(base?`Warranty ends ${fmtDate(end)}`:`No purchase date — counted ${years} yr from today`);
+};
+async function drawThumbs(){
+  if(!formDraft) return;
+  for(const [rowSel,key] of [['#photoRow','photos'],['#manualRow','manuals']]){
+    const row=$(rowSel); if(!row) continue; row.innerHTML='';
+    for(const im of formDraft[key]){
+      const div=document.createElement('div'); div.className='tphoto'+(isPdf(im)?' pdf':'');
+      const u = isPdf(im) ? im.thumb : (im.thumb || await imgUrl(im));
+      if(u) div.style.backgroundImage=`url("${u}")`;
+      div.innerHTML=(isPdf(im)?`${u?'':'<span class="ph">📄</span>'}<span class="lbl">📄 ${esc(im.pages?im.pages+' pages':'PDF')}</span>`:'')+`<button class="rm" title="Remove">✕</button>`;
+      div.querySelector('.rm').onclick=(e)=>{ e.stopPropagation(); formDraft[key]=formDraft[key].filter(x=>x!==im); drawThumbs(); };
+      if(isPdf(im)) div.onclick=()=>openPdf(im,1);
+      row.appendChild(div);
+    }
+    const add=document.createElement('label'); add.className='addphoto';
+    add.innerHTML=`<span class="ic">📷</span>${key==='photos'?'Add':'Add page'}`;
+    add.onclick=()=>pickImages(key);
+    row.appendChild(add);
+    if(key==='manuals'){
+      const pdf=document.createElement('label'); pdf.className='addphoto';
+      pdf.innerHTML='<span class="ic">📄</span>Add PDF';
+      pdf.onclick=()=>pickPdf();
+      row.appendChild(pdf);
+    }
+  }
+}
+let _pickTarget=null;
+function pickImages(key){ _pickTarget=key; const inp=$('#filePickCam'); inp.value=''; inp.dataset.mode=''; inp.click(); }
+async function handlePicked(files){
+  if(!_pickTarget||!files.length||!formDraft) return;
+  toast('Processing '+files.length+' photo'+(files.length>1?'s':'')+'…');
+  for(const file of files){
+    try{
+      const {full,thumb}=await processImage(file);
+      const im={id:uuid(), thumb, driveId:null};
+      await DB.blobSet(im.id, full);
+      formDraft[_pickTarget].push(im);
+    }catch(e){ console.warn(e); toast('Skipped one image','err'); }
+  }
+  drawThumbs();
+}
+window.pickPdf=()=>{ const inp=$('#filePickPdf'); inp.value=''; inp.click(); };
+async function addPdfFiles(files){
+  if(!formDraft) return;
+  toast('Processing PDF…');
+  for(const file of files){
+    try{ const im=await makePdfItem(file, file.name); formDraft.manuals.push(im); toast(`Added ${im.name}${im.pages?` · ${im.pages} pages`:''}`,'ok'); }
+    catch(e){ console.warn(e); toast(`Could not add ${file.name}: ${e.message}`,'err'); }
+  }
+  drawThumbs();
+}
+
+/* ---- Auto-fill from the rating label (Gemini vision, JSON output) ---- */
+window.scanLabel=()=>{
+  if(!state.settings.geminiKey){ toast('Add your Gemini key in Settings first','err'); return; }
+  const inp=$('#filePickCam'); inp.value=''; inp.dataset.mode='label'; inp.click();
+};
+async function runLabelScan(file){
+  const btn=$('#scanBtn'); const orig=btn?btn.innerHTML:'';
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner dark"></span> Reading the label…'; }
+  try{
+    const {full,thumb}=await processImage(file,2800,0.9);
+    const schema={type:'OBJECT',properties:{
+      brand:{type:'STRING'}, model:{type:'STRING'}, serial:{type:'STRING'},
+      productType:{type:'STRING'}, category:{type:'STRING'}, name:{type:'STRING'}, otherCodes:{type:'STRING'}, brandGuess:{type:'STRING'}, warnings:{type:'STRING'}
+    }, required:['brand','model','serial']};
+    const prompt=`This photo shows the rating plate / nameplate / label (or the body) of a household device or appliance. Read it like a careful technician: transcribe exactly what is printed, character by character — never guess, complete or invent values. If something is unreadable, leave it "" and mention it in "warnings".
+Return JSON with these fields (use "" when something is not visible):
+- brand: the brand name as PRINTED on the label (usually the most prominent word or logo, often stylised, or next to ® / ™). Do NOT use certification marks (CE, UL, ETL, TÜV, Intertek, CSA, FCC, UKCA), the retailer, the importer, a "Manufacturer: …" / "Manufactured for …" company, or a "Made in …" line as the brand. If no brand name is printed anywhere, brand MUST be "" — never infer it from the product's looks or from your own knowledge of similar products.
+- brandGuess: only when brand is "": if you recognise this product and believe you know the brand it is sold under, put that single name here (it is shown to the user as a suggestion to verify); otherwise ""
+- model: the main model number / type designation as printed (e.g. "WAN28280GB", "TP07"); if several codes are printed (Model, Type, E-Nr, PNC, Part No.), choose the one that identifies the product model
+- serial: the serial number (S/N, Serial No., SN, Ser. Nr.) exactly as printed; a manufacturing date code (FD, date) is NOT a serial
+- productType: what the device is, e.g. "Washing machine", "Air purifier"
+- category: the best fit from: ${CATS.join(', ')}
+- name: a short friendly name: the printed brand (if any) + product type, e.g. "Bosch washing machine"; without a printed brand use the printed product name, e.g. "LED ScreenLinear light bar"
+- otherCodes: other identifiers on the label that help find manuals or spare parts (E-Nr, Type, PNC, Part No., Item No., SKU, Manufacturer, production date), as "Label: value; Label: value"
+- warnings: anything uncertain or unreadable, e.g. "brand only shown as a logo", "serial partly hidden", "photo blurry", "no rating label visible"`;
+    const res=await Gemini.generateFull({key:state.settings.geminiKey, model:state.settings.geminiModel,
+      parts:[{text:prompt},{inline_data:{mime_type:'image/jpeg', data:await blobToBase64(full)}}],
+      json:{schema}, temperature:null, maxOutputTokens:4096});
+    let data; try{ data=JSON.parse(res.text); }catch(e){ throw new Error('unexpected response, try again'); }
+    if(!formDraft){ return; } // user left the form meanwhile
+    const filled=[];
+    const set=(k,v,onlyIfEmpty)=>{ v=(v==null?'':String(v)).trim(); if(!v) return; if(onlyIfEmpty && (formDraft[k]||'').trim()) return; formDraft[k]=v; const el=$('#f_'+k); if(el) el.value=v; filled.push(k); };
+    set('brand',data.brand); set('model',data.model); set('serial',data.serial);
+    const guess=(!String(data.brand||'').trim() && String(data.brandGuess||'').trim())||'';
+    if(guess){ data.warnings=['brand not printed on the label — possibly "'+guess+'"? please check', (data.warnings||'').trim()].filter(Boolean).join('; '); data.otherCodes=[(data.otherCodes||'').trim(), 'Brand not printed (possibly '+guess+')'].filter(Boolean).join('; '); }
+    set('name',data.name,true); set('category',data.category,true);
+    const codes=(data.otherCodes||'').trim();
+    if(codes && !(formDraft.notes||'').includes(codes)){
+      formDraft.notes=((formDraft.notes||'').trim()?formDraft.notes.trim()+'\n':'')+'Label codes: '+codes;
+      const el=$('#f_notes'); if(el) el.value=formDraft.notes; filled.push('notes');
+    }
+    if(filled.length){
+      // keep the label photo with the device (serial & ratings are handy later)
+      const im={id:uuid(), thumb, driveId:null}; await DB.blobSet(im.id, full); formDraft.photos.push(im); drawThumbs();
+      const read=[data.brand,data.model].filter(v=>v&&String(v).trim()).join(' ');
+      const warn=(data.warnings||'').trim();
+      toast('Read: '+(read||'(no brand/model)')+' · '+(res.model===state.settings.geminiModel?'':'via '+res.model+' · ')+'label photo kept'+(warn?' · ⚠ '+warn:''), warn?'':'ok', warn?9000:5000);
+      console.info('Label scan ('+res.model+'):', JSON.stringify(data));
+    } else toast('Could not read brand, model or serial from this photo — try a closer, sharper shot'+(data.warnings?' ('+data.warnings+')':''),'err');
+  }catch(e){ toast('Label scan failed: '+e.message,'err'); }
+  finally{ const b=$('#scanBtn'); if(b){ b.disabled=false; b.innerHTML=orig; } }
+}
+
+window.saveForm = async ()=>{
+  const d=formDraft; if(!d) return;
+  if(!$('#f_name').value.trim()){ toast('Please give it a name','err'); return; }
+  d.name=$('#f_name').value.trim();
+  if(d.warrantyEnd && d.warrantyAck && d.warrantyAck!==d.warrantyEnd) delete d.warrantyAck; // re-arm the reminder when the date changes
+  d.updatedAt=now(); if(!d.createdAt) d.createdAt=now();
+  const idx=state.devices.findIndex(x=>x.id===d.id);
+  const clean={...d}; delete clean._editing;
+  if(idx>=0) state.devices[idx]=clean; else state.devices.unshift(clean);
+  await persistDevices();
+  formDraft=null;
+  toast('Saved'+(state.settings.driveConnected?' · syncing to Drive':''),'ok');
+  setTab('devices');
+};
+window.cancelForm=()=>{ const wasEdit=formDraft&&formDraft._editing; const id=formDraft&&formDraft.id; formDraft=null; if(wasEdit) openDevice(id); else setTab('devices'); };
+window.editDevice=(id)=>{ const d=getDevice(id); if(!d) return; formDraft=JSON.parse(JSON.stringify(d)); formDraft._editing=true; state.tab='add'; [...$('#tabs').children].forEach(b=>b.classList.toggle('active',b.dataset.tab==='add')); renderForm(); };
+window.deleteDevice=async(id)=>{
+  if(!confirm('Delete this device and its photos? This removes it from this device'+(state.settings.driveConnected?' and Drive':'')+'.')) return;
+  const d=getDevice(id);
+  for(const im of [...(d.photos||[]),...(d.manuals||[])]){ await DB.blobDel(im.id); if(isPdf(im)) PdfJs.forget(im.id); if(state.objUrls[im.id]){ URL.revokeObjectURL(state.objUrls[im.id]); delete state.objUrls[im.id]; } }
+  state.devices=state.devices.filter(x=>x.id!==id);
+  await persistDevices();
+  toast('Deleted'); setTab('devices');
+};
+window.askAbout=(id)=>{ state._askDevice=id; setTab('ask'); };
+
+/* ---- Ask (chat) ---- */
+function renderAsk(deviceId){
+  const d = deviceId ? getDevice(deviceId) : null;
+  if(!state.devices.length){
+    view.innerHTML=`<div class="view"><h2 class="section">Ask</h2><div class="empty"><div class="big">💬</div><h3>Register a device first</h3><p>Once you add a device and its manual, ask anything about how it works.</p><button class="btn primary" style="max-width:240px;margin:14px auto 0" onclick="setTab('add')">＋ Register a device</button></div></div>`;
+    return;
+  }
+  if(!state.settings.geminiKey){
+    view.innerHTML=`<div class="view"><h2 class="section">Ask</h2><div class="banner">⚠️ Add your Gemini API key in Settings to enable AI answers.<button class="btn primary sm" style="width:auto;margin-left:auto" onclick="setTab('settings')">Open Settings</button></div></div>`;
+    return;
+  }
+  if(!d){
+    view.innerHTML=`<div class="view"><h2 class="section">Ask about…</h2><p class="sub">Pick a device, or use 📷 Identify to find it from a photo.</p>
+      <div class="grid">${state.devices.map(x=>`<div class="dcard" onclick="askAbout('${x.id}')"><div class="thumb" data-thumb="${x.id}">${(x.photos&&x.photos[0])?'':'<span class="ph">📦</span>'}</div><div class="body"><p class="name">${esc(x.name)}</p><p class="meta">${esc([x.brand,x.model].filter(Boolean).join(' · ')||'—')}</p></div></div>`).join('')}</div></div>`;
+    state.devices.forEach(async x=>{ if(x.photos&&x.photos[0]){const u=await imgUrl(x.photos[0]);const el=view.querySelector(`[data-thumb="${x.id}"]`);if(el&&u)el.style.backgroundImage=`url("${u}")`;} });
+    return;
+  }
+  if(!d._chat) d._chat=[];
+  const summary=manualSummary(d);
+  const oversize=(d.manuals||[]).some(im=>isPdf(im)&&im.size>MAX_PDF_BYTES);
+  view.innerHTML=`<div class="view" style="padding-bottom:70px">
+    <button class="btn ghost sm" style="margin-bottom:6px" onclick="state._askDevice=null;setTab('ask')">‹ Change device</button>
+    <h2 class="section" style="margin:2px 0 2px">${esc(d.name)}</h2>
+    <p class="sub">${summary
+      ? `Answering from ${esc(summary)}${oversize?' · ⚠️ a PDF over 50 MB will be skipped':''} · tap a 📄 reference to see the page`
+      : `No manual pages added — answers use general knowledge${d.manualUrl?'. Attach the PDF from your saved manual link for better answers':''}`}</p>
+    <div class="chat" id="chat"></div>
+  </div>
+  <div class="askbar">
+    <button class="iconbtn" id="attachBtn" title="Attach a photo of the issue">📎</button>
+    <textarea id="askInput" rows="1" placeholder="Ask about ${esc(d.name)}…"></textarea>
+    <button class="iconbtn primary" id="sendBtn">➤</button>
+  </div>`;
+  drawChat(d);
+  $('#chat').addEventListener('click',e=>{ const b=e.target.closest('.cite'); if(b) openSource(d.id, b.dataset.ref); });
+  const ta=$('#askInput');
+  ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.min(120,ta.scrollHeight)+'px';});
+  $('#sendBtn').onclick=()=>sendAsk(d);
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAsk(d);}});
+  $('#attachBtn').onclick=()=>{ _attachPending=null; const inp=$('#filePickCam'); inp.value=''; inp.dataset.mode='attach'; inp.click(); };
+}
+async function drawChat(d){
+  const c=$('#chat'); if(!c) return;
+  if(!d._chat.length){ c.innerHTML=`<div class="bubble ai">Hi! Ask me anything about your <strong>${esc(d.name)}</strong> — setup, error codes, filter changes, troubleshooting. I'll read its manual to answer${(d.manuals&&d.manuals.length)?' and point you to the page':''}.</div>`; return; }
+  c.innerHTML='';
+  for(const m of d._chat){
+    const b=document.createElement('div'); b.className='bubble '+(m.role==='user'?'me':'ai');
+    b.innerHTML=formatMd(m.text, m.role==='user'?null:d);
+    if(m.imgUrl){ b.innerHTML+=`<div class="imgs"><img src="${m.imgUrl}"></div>`; }
+    c.appendChild(b);
+  }
+  c.scrollTop=c.scrollHeight;
+}
+/* citations the model writes: [p.3] [page 3] [doc1 p.12] [doc 2, pp. 4-5] (parentheses accepted too) */
+const CITE_RE=/[\[(]\s*(?:doc(?:ument)?\s*#?\s*(\d+))?\s*[,:;]?\s*(?:(?:pp?|pg|pages?)\s*\.?\s*#?\s*(\d+)(?:\s*[-–—,\/]\s*(?:(?:pp?|pg|pages?)\s*\.?\s*)?\d+)*)?\s*[\])]/gi;
+function resolveCite(d,doc,page){
+  const items=d.manuals||[], imgs=items.filter(isImage), pdfs=items.filter(isPdf);
+  const p=page?parseInt(page,10):0;
+  if(doc){
+    const k=parseInt(doc,10); const pdf=pdfs[k-1]; if(!pdf) return null;
+    const pg=Math.max(1,p||1); if(pdf.pages && pg>pdf.pages) return null;
+    return {ref:`d${k}p${pg}`, docName:shortName(pdf.name), page:pg};
+  }
+  if(!p) return null;
+  if(imgs[p-1]) return {ref:`p${p}`, page:p};
+  if(pdfs.length===1){ if(pdfs[0].pages && p>pdfs[0].pages) return null; return {ref:`d1p${p}`, docName:shortName(pdfs[0].name), page:p}; }
+  return null;
+}
+function formatMd(t,d){
+  let h=esc(t)
+    .replace(/^#{1,4}\s+(.*)$/gm,'<strong>$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^\s*[-*]\s+(.*)$/gm,'• $1');
+  if(d) h=h.replace(CITE_RE,(m,doc,page)=>{
+    if(!doc&&!page) return m;
+    const c=resolveCite(d,doc,page); if(!c) return m;
+    const inner=m.slice(1,-1).trim().replace(/^doc(?:ument)?\s*#?\s*\d+\s*[,:;]?\s*/i,'');
+    const label=c.docName ? `${c.docName} · ${inner||('p.'+c.page)}` : inner;
+    return `<button class="cite" data-ref="${c.ref}" title="Show this page of the manual">📄 ${esc(label)}</button>`;
+  });
+  return h;
+}
+window.openSource=async(devId,ref)=>{
+  const d=getDevice(devId); if(!d) return; const items=d.manuals||[]; let m;
+  if((m=/^p(\d+)$/.exec(ref))){
+    const im=items.filter(isImage)[+m[1]-1]; if(!im){ toast('Page not found','err'); return; }
+    const u=await imgUrl(im); if(!u){ toast('Page image not available','err'); return; }
+    openLightbox(u,'Manual page '+m[1]);
+  }else if((m=/^d(\d+)p(\d+)$/.exec(ref))){
+    const pdf=items.filter(isPdf)[+m[1]-1]; if(!pdf){ toast('Document not found','err'); return; }
+    openPdf(pdf,+m[2]);
+  }
+};
+let _attachPending=null;
+async function sendAsk(d){
+  const ta=$('#askInput'); const q=ta.value.trim();
+  if(!q && !_attachPending) return;
+  ta.value=''; ta.style.height='auto';
+  const userMsg={role:'user', text:q||'(see photo)'};
+  if(_attachPending){ userMsg.imgUrl=await blobToDataURL(_attachPending.blob); }
+  d._chat.push(userMsg);
+  drawChat(d);
+  // typing indicator
+  const c=$('#chat'); const tping=document.createElement('div'); tping.className='bubble ai'; tping.innerHTML='<span class="typing"><i></i><i></i><i></i></span>'; c.appendChild(tping); c.scrollTop=c.scrollHeight;
+  try{
+    const items=d.manuals||[]; const nImg=items.filter(isImage).length, nPdf=items.filter(isPdf).length;
+    const citeRules=(nImg||nPdf)
+      ? `\n\nPAGE REFERENCES: whenever a statement comes from the manual, add a reference right after it, in exactly this format:`
+        +(nImg?`\n- [p.N] = photographed manual page N (the pages are labelled "Manual page N" below; there are ${nImg})`:'')
+        +(nPdf?`\n- [doc${nPdf>1?'K':'1'} p.N] = page N of PDF document ${nPdf>1?'K':'1'}, counting the first page of the file as page 1 (ignore the page numbers printed on the pages)`:'')
+        +`\nExample: "Hold the power button for 5 seconds [${nImg?'p.3':'doc1 p.12'}]." Reference only pages that really contain the information; add no references for general knowledge.`
+      : '';
+    const sys=`You are DeviceVault's assistant, helping the owner of a specific "${d.name}"${d.brand?` by ${d.brand}`:''}${d.model?` (model ${d.model})`:''}. Answer their question using the attached manual (photographed pages and/or PDF documents) and the device details. Be concise, practical, and step-by-step when useful. If the manual doesn't cover it, say so briefly and give clearly-labelled general guidance. Include any relevant safety warnings.${citeRules}\n\nDevice notes: ${d.notes||'(none)'}`;
+    const parts=[{text:sys}];
+    const ctx=await manualContext(d);
+    parts.push(...ctx.parts);
+    if(_attachPending){ parts.push({text:'Here is a photo the user just took of the device / problem:'}); parts.push({inline_data:{mime_type:'image/jpeg', data:await blobToBase64(_attachPending.blob)}}); }
+    parts.push({text:`Question: ${q||'Please look at the attached photo and help.'}`});
+    // history (text only, last 6 turns) for context
+    const history = d._chat.slice(0,-1).slice(-6).map(m=>({role:m.role==='user'?'user':'model', parts:[{text:m.text}]}));
+    const res = await Gemini.generateFull({key:state.settings.geminiKey, model:state.settings.geminiModel, parts, history, temperature:0.4});
+    let ans = res.text;
+    if(ctx.skipped.length) ans += `\n\n(Not sent to the AI: ${ctx.skipped.join('; ')})`;
+    if(res.note) ans += `\n\n(${res.note})`;
+    d._chat.push({role:'model', text:ans});
+  }catch(e){
+    d._chat.push({role:'model', text:'⚠️ '+e.message});
+  }finally{
+    _attachPending=null;
+    drawChat(d);
+  }
+}
+
+/* ---- Identify (snap a photo -> match device) ---- */
+function renderIdentify(){
+  view.innerHTML=`<div class="view"><h2 class="section">Identify a device</h2>
+    <p class="sub">Snap a photo of the appliance and I'll match it to one of your registered devices, then you can ask about it.</p>
+    <div class="empty" id="idBox"><div class="big">📷</div><h3>Take or choose a photo</h3>
+      <button class="btn primary" style="max-width:240px;margin:14px auto 0" onclick="startIdentify()">📷 Open camera</button>
+      ${!state.settings.geminiKey?'<p class="note warn" style="margin-top:14px">Add your Gemini key in Settings to enable matching.</p>':''}
+      ${!state.devices.length?'<p class="note" style="margin-top:14px">Register a device first.</p>':''}
+    </div></div>`;
+}
+window.startIdentify=()=>{ if(!state.settings.geminiKey){toast('Add Gemini key in Settings','err');return;} if(!state.devices.length){toast('No devices yet','err');return;} const inp=$('#filePickCam'); inp.value=''; inp.dataset.mode='identify'; inp.click(); };
+async function runIdentify(file){
+  const box=$('#idBox'); if(box) box.innerHTML='<div class="spinner dark" style="width:30px;height:30px;margin:10px auto"></div><p class="note">Matching against your devices…</p>';
+  try{
+    const {full}=await processImage(file,1024,0.8);
+    const list = state.devices.map((d,i)=>`${i+1}. ${d.name}${d.brand?' — '+d.brand:''}${d.model?' '+d.model:''}${d.category?' ['+d.category+']':''}`).join('\n');
+    const parts=[
+      {text:`Look at this photo of a home device/appliance. Which ONE of my registered devices is it most likely to be? Reply with ONLY the number, or 0 if none match.\n\nMy devices:\n${list}`},
+      {inline_data:{mime_type:'image/jpeg', data:await blobToBase64(full)}}
+    ];
+    const ans = await Gemini.generate({key:state.settings.geminiKey, model:state.settings.geminiModel, parts});
+    const n = parseInt((ans.match(/\d+/)||[0])[0],10);
+    if(n>=1 && n<=state.devices.length){
+      const d=state.devices[n-1];
+      toast('Matched: '+d.name,'ok');
+      askAbout(d.id);
+    }else{
+      if($('#idBox')) $('#idBox').innerHTML=`<div class="big">🤔</div><h3>No confident match</h3><p class="note">Pick it manually from the Ask tab.</p><button class="btn primary" style="max-width:200px;margin:12px auto 0" onclick="setTab('ask')">Choose manually</button><button class="btn" style="max-width:200px;margin:8px auto 0" onclick="startIdentify()">Try another photo</button>`;
+    }
+  }catch(e){ toast('Identify failed: '+e.message,'err'); renderIdentify(); }
+}
+
+/* ---- Find the manual online ---- */
+let _find=null; // {brand, model, name, target:{kind:'draft'}|{kind:'device',id}, results:[]}
+window.findManualFromForm=()=>{
+  if(!formDraft) return;
+  const val=id=>{ const el=$(id); return el? el.value.trim() : ''; };
+  openFindManual({brand:val('#f_brand')||formDraft.brand||'', model:val('#f_model')||formDraft.model||'', name:val('#f_name')||formDraft.name||'', target:{kind:'draft'}});
+};
+window.findManual=(id)=>{ const d=getDevice(id); if(!d) return; openFindManual({brand:d.brand||'', model:d.model||'', name:d.name||'', target:{kind:'device',id}}); };
+function openFindManual(ctx){
+  if(!ctx.brand && !ctx.model){ toast('Enter the brand or model number first','err'); return; }
+  _find={...ctx, results:[]};
+  const q=[ctx.brand,ctx.model].filter(Boolean).join(' ');
+  const g=s=>'https://www.google.com/search?q='+encodeURIComponent(s);
+  const hasKey=!!state.settings.geminiKey;
+  openSheet(`<h3>Find the manual online</h3><p class="sub" style="margin:0 0 10px">${esc(q)}</p>
+    <h5>Quick searches</h5>
+    <div class="chips">
+      <a class="pill" href="${g(q+' user manual pdf')}" target="_blank" rel="noopener">🔍 Google</a>
+      <a class="pill" href="${g('site:manualslib.com '+q)}" target="_blank" rel="noopener">📚 ManualsLib</a>
+      <a class="pill" href="${g('site:manua.ls '+q)}" target="_blank" rel="noopener">📚 Manua.ls</a>
+      ${ctx.brand?`<a class="pill" href="${g(ctx.brand+' support '+ctx.model+' manual download')}" target="_blank" rel="noopener">🏭 ${esc(ctx.brand)} support</a>`:''}
+    </div>
+    <button class="btn primary" id="aiFindBtn" onclick="aiFindManual()" ${(hasKey||PROXY)?'':'disabled'}>${hasKey?'✨ Let Gemini search for it':'🔎 Search the web for it'}</button>
+    ${hasKey
+      ? `<p class="note" style="margin-top:8px">Uses Gemini with Google Search — the brand and model are sent to Google.${PROXY?' If your key has no Google Search quota, the app searches DuckDuckGo instead and Gemini sorts the results.':''}</p>`
+      : (PROXY ? '<p class="note" style="margin-top:8px">Searches DuckDuckGo for the brand and model. Add a Gemini key in Settings to have Gemini sort the results.</p>'
+               : '<p class="note warn" style="margin-top:8px">Add your Gemini key in Settings to enable the AI search.</p>')}
+    <div id="findOut"></div>
+    <div class="divider"></div>
+    <div class="field"><label>Got a link to the PDF? Paste it here</label><input id="findUrl" inputmode="url" placeholder="https://…/manual.pdf"/></div>
+    <div class="btnrow"><button class="btn sm" onclick="attachFromUrl($('#findUrl').value.trim())">⬇ Attach as manual</button><button class="btn sm" onclick="saveManualLink($('#findUrl').value.trim())">🔗 Save link only</button></div>
+    <button class="btn ghost" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
+}
+window.aiFindManual=async()=>{
+  const c=_find; if(!c) return;
+  const out=$('#findOut'), btn=$('#aiFindBtn'); if(!out||!btn) return;
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Searching…'; out.innerHTML='';
+  try{
+    try{ await geminiFindManual(c,out); }
+    catch(e){
+      if(!PROXY){ out.innerHTML=searchUnavailableHtml(e); return; }
+      try{ await webFindManual(c,out,e); }
+      catch(e2){ out.innerHTML=searchUnavailableHtml(e)+`<p class="note warn">The web search failed too: ${esc(e2.message)}</p>`; }
+    }
+  }finally{ btn.disabled=false; btn.innerHTML='✨ Search again'; }
+};
+/* Gemini + Google Search grounding (needs a key whose project has search quota). */
+async function geminiFindManual(c,out){
+  if(!state.settings.geminiKey) throw Object.assign(new Error('No Gemini key'),{noKey:true});
+  {
+    const prompt=`Find the official user manual (instruction manual / owner's manual) for this device using Google Search.
+Brand: ${c.brand||'(unknown)'}
+Model: ${c.model||'(unknown)'}
+Description: ${c.name||'(none)'}
+
+Prefer, in this order: (1) a direct PDF link on the manufacturer's official website, (2) the manufacturer's support / downloads page for this exact model, (3) a reputable manual archive (manualslib.com, manua.ls, archive.org) only if nothing official turns up.
+Reply with up to 5 results, one per line, in exactly this format and nothing else:
+TITLE | URL | official or third-party | short note (language, what the link is)
+Only list URLs that actually appeared in your search results — never invent or guess a URL. If the exact model cannot be found, list the closest match and say so in the note. If nothing useful is found, reply with the single line: NOT FOUND`;
+    const res=await Gemini.generateFull({key:state.settings.geminiKey, model:state.settings.geminiModel, parts:[{text:prompt}], tools:[{googleSearch:{}}], temperature:null, maxOutputTokens:4096});
+    const gm=(res.candidate&&res.candidate.groundingMetadata)||{};
+    const results=[], seen=new Set();
+    const add=(title,url,note)=>{
+      url=(url||'').replace(/[)\].,;>'"*]+$/,'');
+      if(!/^https?:\/\//i.test(url)||seen.has(url)) return; seen.add(url);
+      let host=''; try{ host=new URL(url).hostname.replace(/^www\./,''); }catch(e){}
+      results.push({title:(title||'').replace(/^[*_\s]+|[*_\s]+$/g,'')||host||url, url, note:note||host});
+    };
+    for(const line of res.text.split('\n')){
+      const m=/^\s*(?:[-*•]|\d+[.)])?\s*(.+?)\s*\|\s*<?(https?:\/\/\S+?)>?\s*(?:\|\s*(.*))?$/.exec(line);
+      if(m) add(m[1], m[2], (m[3]||'').replace(/\s*\|\s*/g,' · '));
+    }
+    if(!results.length) for(const u of (res.text.match(/https?:\/\/[^\s<>"'()\]]+/g)||[])) add('',u,'');
+    const sources=(gm.groundingChunks||[]).map(ch=>ch.web).filter(w=>w&&w.uri);
+    c.results=results.concat(sources.map(s=>({title:s.title||'', url:s.uri, note:'', source:true})));
+    let h='';
+    if(res.note) h+=`<p class="note" style="margin-top:10px">${esc(res.note)}</p>`;
+    if(results.length) h+='<h5>Links Gemini suggested</h5>'+results.map((r,i)=>linkRow(r,i)).join('');
+    else h+=`<p class="note" style="margin-top:12px;white-space:pre-wrap">${esc(res.text)}</p>`;
+    if(sources.length) h+='<h5>Pages it looked at</h5>'+sources.map((s,i)=>linkRow(c.results[results.length+i], results.length+i)).join('');
+    if(gm.searchEntryPoint && gm.searchEntryPoint.renderedContent)
+      h+=`<iframe class="gsug" sandbox="allow-popups allow-popups-to-escape-sandbox" srcdoc="${esc('<base target="_blank">'+gm.searchEntryPoint.renderedContent)}"></iframe>`;
+    out.innerHTML=h;
+  }
+}
+/* Why Gemini could not search, in plain words (browser version: nothing else to fall back to). */
+function searchUnavailableHtml(e){
+  const why = e.noKey ? 'Add a Gemini key in Settings to search with Gemini.'
+    : e.failed ? "Gemini's Google Search isn't available on this API key: recently created free keys have no search quota on Gemini 3 models, and the Gemini 2.5 models are closed to new projects."
+    : e.message;
+  return `<p class="note warn" style="margin-top:10px">${esc(why)} Use the quick searches above (they open in your browser), then paste the PDF link below.${e.failed?`<details style="margin-top:6px"><summary>Details</summary>${esc(e.message)}</details>`:''}</p>`;
+}
+/* Web search without any API key: DuckDuckGo's HTML results, read through the Android shell's gateway. */
+async function webSearch(q,{pdfOnly=false}={}){
+  if(!PROXY) throw new Error('Web search needs the DeviceVault app');
+  const r=await fetch(PROXY('https://html.duckduckgo.com/html/?q='+encodeURIComponent(q+(pdfOnly?' filetype:pdf':''))));
+  if(!r.ok) throw new Error('search request failed (HTTP '+r.status+')');
+  return parseDdg(await r.text());
+}
+function parseDdg(html){
+  const doc=new DOMParser().parseFromString(html,'text/html'); const out=[], seen=new Set();
+  for(const res of doc.querySelectorAll('.result')){
+    if(res.classList.contains('result--ad')) continue;
+    const a=res.querySelector('a.result__a'); if(!a) continue;
+    let url=a.getAttribute('href')||'';
+    try{ const u=new URL(url,'https://duckduckgo.com'); url=u.searchParams.get('uddg')||u.href; }catch(e){ continue; }
+    if(!/^https?:\/\//i.test(url)||/duckduckgo\.com\//i.test(url)||seen.has(url)) continue; seen.add(url);
+    const snippet=((res.querySelector('.result__snippet')||{}).textContent||'').trim().replace(/\s+/g,' ');
+    out.push({title:a.textContent.trim().replace(/\s+/g,' '), url, snippet});
+  }
+  return out;
+}
+function webNote(r){
+  let host=''; try{ host=new URL(r.url).hostname.replace(/^www\./,''); }catch(e){}
+  return (/\.pdf(\?|#|$)/i.test(r.url)?'PDF · ':'')+host+(r.snippet?' — '+r.snippet.slice(0,110):'');
+}
+/* Fallback when Gemini cannot search: DuckDuckGo results (PDF-only query first), then Gemini — plain
+   generation, which free keys do have — sorts them into official / third-party / unrelated. */
+async function webFindManual(c,out,geminiErr){
+  const q=[c.brand,c.model].filter(Boolean).join(' ')+' manual';
+  const settled=await Promise.allSettled([webSearch(q,{pdfOnly:true}), webSearch(q)]);
+  const ok=settled.filter(s=>s.status==='fulfilled').map(s=>s.value);
+  if(!ok.length) throw settled[0].reason;
+  const rows=[], seen=new Set();
+  for(const r of [...(ok[0]||[]).slice(0,4), ...(ok[1]||ok[0])]){ if(seen.has(r.url)) continue; seen.add(r.url); rows.push({title:r.title, url:r.url, snippet:r.snippet, note:webNote(r)}); }
+  const why = geminiErr.noKey ? 'Results from DuckDuckGo for “'+q+'”.'
+    : geminiErr.failed ? "Gemini's Google Search isn't available on this API key (no free search quota on Gemini 3; the 2.5 models are closed to new projects), so these come from DuckDuckGo for “"+q+"”."
+    : "Gemini's search failed ("+geminiErr.message+"), so these come from DuckDuckGo for “"+q+"”.";
+  const render=(list,extra)=>{ c.results=list; out.innerHTML=`<p class="note" style="margin-top:10px">${esc(why)}${extra||''}</p>`+(list.length?'<h5>Found on the web</h5>'+list.map((r,i)=>linkRow(r,i)).join(''):'<p class="note warn">Nothing found. Try the quick searches above or a different spelling of the model number.</p>'); };
+  render(rows.slice(0,12));
+  if(!rows.length || !state.settings.geminiKey) return;
+  try{
+    const list=rows.slice(0,12);
+    const prompt=`These are web search results for the user manual of a device.
+Brand: ${c.brand||'(unknown)'}
+Model: ${c.model||'(unknown)'}
+Description: ${c.name||'(none)'}
+
+For each result decide: "official" = the manufacturer's / brand's own website, "third-party" = a manual archive, shop or other site that is about this device, "unrelated" = not about this device (different product, generic page). Add a short note: what the page is (PDF manual, support page, product page, forum…), its language if not English, or why it is unrelated.
+
+${list.map((r,i)=>`${i+1}. ${r.title} — ${r.url} — ${r.snippet}`).join('\n')}`;
+    const schema={type:'OBJECT',properties:{items:{type:'ARRAY',items:{type:'OBJECT',properties:{i:{type:'INTEGER'},kind:{type:'STRING'},note:{type:'STRING'}},required:['i','kind']}}},required:['items']};
+    const res=await Gemini.generateFull({key:state.settings.geminiKey, model:state.settings.geminiModel, parts:[{text:prompt}], json:{schema}, temperature:null, maxOutputTokens:2048});
+    const items=(JSON.parse(res.text).items||[]); const rank={official:0,'third-party':1,unrelated:2};
+    const label={official:'Official site',"third-party":'Third-party',unrelated:'Probably unrelated'};
+    for(const it of items){ const r=list[(it.i|0)-1]; if(!r) continue; const k=String(it.kind||'').toLowerCase(); if(!(k in rank)) continue; r.kind=k; r.note=label[k]+(it.note?' · '+String(it.note).slice(0,120):'')+' · '+webNote({url:r.url}); }
+    list.forEach((r,i)=>r._i=i);
+    const sorted=list.slice().sort((a,b)=>((a.kind in rank?rank[a.kind]:1)-(b.kind in rank?rank[b.kind]:1))||(a._i-b._i));
+    render(sorted, ' Sorted by '+res.model+'.');
+  }catch(e){ console.warn('result sorting skipped: '+e.message); }
+}
+function linkRow(r,i){
+  let host=''; try{ host=new URL(r.url).hostname.replace(/^www\./,''); }catch(e){}
+  return `<div class="linkrow"><div class="t"><b>${esc(r.title||host||r.url)}</b><small>${esc(r.note||host||r.url)}</small></div>
+    <div class="acts"><a class="btn sm" href="${esc(r.url)}" target="_blank" rel="noopener">Open ↗</a>${r.source?'':`<button class="btn sm" title="Download the PDF and attach it" onclick="findAct('attach',${i})">⬇</button><button class="btn sm" title="Save as this device's manual link" onclick="findAct('link',${i})">🔗</button>`}</div></div>`;
+}
+window.findAct=(what,i)=>{ const r=_find&&_find.results[i]; if(!r) return; if(what==='attach') attachFromUrl(r.url); else saveManualLink(r.url); };
+window.attachFromUrl=async(url)=>{
+  if(!_find) return;
+  if(!/^https?:\/\//i.test(url)){ toast('Enter a valid http(s) link','err'); return; }
+  toast('Downloading…');
+  let blob;
+  try{ const r=await fetch(PROXY?PROXY(url):url, PROXY?{}:{mode:'cors'}); if(!r.ok) throw new Error('HTTP '+r.status); blob=await r.blob(); }
+  catch(e){ toast(PROXY ? "Couldn't download it ("+e.message+"). Open the link, save the PDF, then add it with 📄 Add PDF." : "Couldn't download it directly (the site blocks cross-site downloads). Open the link, save the PDF, then add it with 📄 Add PDF.",'err'); return; }
+  if(!(await looksLikePdf(blob))){ toast('That link is a web page, not a PDF. Open it and look for the PDF download.','err'); return; }
+  let name=''; try{ name=decodeURIComponent(new URL(url).pathname.split('/').pop()||''); }catch(e){}
+  if(!/\.pdf$/i.test(name)) name=([_find.brand,_find.model].filter(Boolean).join(' ')||'manual')+'.pdf';
+  try{ const im=await makePdfItem(blob,name); await addManualItem(im,url); }
+  catch(e){ toast('Could not attach: '+e.message,'err'); }
+};
+async function addManualItem(im, sourceUrl){
+  const t=_find.target;
+  if(t.kind==='draft'){
+    if(!formDraft){ toast('The form was closed','err'); return; }
+    formDraft.manuals.push(im);
+    if(sourceUrl && !formDraft.manualUrl){ formDraft.manualUrl=sourceUrl; const el=$('#f_manualUrl'); if(el) el.value=sourceUrl; }
+    drawThumbs();
+  }else{
+    const d=getDevice(t.id); if(!d) return;
+    d.manuals=d.manuals||[]; d.manuals.push(im);
+    if(sourceUrl && !d.manualUrl) d.manualUrl=sourceUrl;
+    d.updatedAt=now(); await persistDevices(); openDevice(d.id);
+  }
+  closeSheet(); toast(`Attached ${im.name}${im.pages?` · ${im.pages} pages`:''}`,'ok');
+}
+window.saveManualLink=async(url)=>{
+  if(!_find) return;
+  if(!/^https?:\/\//i.test(url)){ toast('Enter a valid http(s) link','err'); return; }
+  const t=_find.target;
+  if(t.kind==='draft'){ if(!formDraft) return; formDraft.manualUrl=url; const el=$('#f_manualUrl'); if(el) el.value=url; }
+  else { const d=getDevice(t.id); if(!d) return; d.manualUrl=url; d.updatedAt=now(); await persistDevices(); openDevice(d.id); }
+  closeSheet(); toast('Manual link saved','ok');
+};
+
+/* ---- Settings ---- */
+function nativeInfo(){ try{ return JSON.parse(NATIVE.getAppInfo()); }catch(e){ return {package:'',version:''}; } }
+function renderSettings(){
+  const s=state.settings;
+  view.innerHTML=`<div class="view"><h2 class="section">Settings</h2>
+
+  <div class="block">
+    <h4>Gemini AI</h4>
+    <div class="field"><label>API key</label><input id="s_key" type="password" placeholder="AIza…" value="${esc(s.geminiKey)}"/></div>
+    <div class="field"><label>Model</label>
+      <select id="s_model"><option value="${esc(s.geminiModel)}">${esc(s.geminiModel)}</option></select>
+    </div>
+    <div class="btnrow">
+      <button class="btn sm" onclick="fetchModels()">↻ Load models</button>
+      <button class="btn sm" onclick="testGemini()">Test key</button>
+    </div>
+    <div class="field" style="margin-top:12px"><label>Fallback models — tried in this order when the model above is over quota, unavailable or lacks a feature (one per line)</label>
+      <textarea id="s_ladder" spellcheck="false" style="min-height:96px;font-family:ui-monospace,monospace;font-size:13px">${esc((s.geminiLadder||[]).join('\n'))}</textarea>
+    </div>
+    <div class="btnrow">
+      <button class="btn sm" onclick="resetLadder()">Reset to default ladder</button>
+      <button class="btn sm" onclick="Gemini.forget();toast('Will retry every model on the next request','ok')">Retry rested models</button>
+    </div>
+    <p class="note" style="margin-top:10px">Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>. Stored only on this device. A current Flash model (e.g. <code>gemini-3.8-flash</code>) handles manuals and label scanning. <b>Finding manuals uses Google Search grounding, which has no free quota on Gemini 3 models</b> — keep <code>gemini-2.5-flash</code> in the fallback list (500 free searches a day) unless your Google Cloud project has billing enabled.</p>
+  </div>
+
+  <div class="block">
+    <h4>Warranty reminders</h4>
+    <div class="field"><label>Remind me this many days before a warranty ends</label><input id="s_lead" type="number" min="0" max="365" inputmode="numeric" value="${esc(String(s.warrantyLeadDays??30))}"/></div>
+    <p class="note">Devices whose warranty ends within this window are listed at the top of the Devices tab. On a device's page you can also add the reminder to Google Calendar or download an .ics file for Apple/Outlook.</p>
+  </div>
+
+  <div class="block">
+    <h4>Google Drive backup</h4>
+    ${NATIVE?'':`<div class="field"><label>OAuth Client ID</label><input id="s_client" placeholder="…apps.googleusercontent.com" value="${esc(s.googleClientId)}"/></div>`}
+    ${s.driveConnected
+      ? `<div class="btnrow"><button class="btn" onclick="pullFromDrive(false)">⬇ Restore</button><button class="btn" onclick="syncToDrive()">⬆ Back up now</button></div>
+         <button class="btn danger" style="margin-top:10px" onclick="disconnectDrive();renderSettings()">Disconnect Drive</button>`
+      : `<button class="btn primary" onclick="connectDrive()">Connect Google Drive</button>`}
+    ${NATIVE?`<details class="help"><summary>One-time setup for the Android app (~5 min)</summary>
+      <ol>
+        <li>Open <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a> → create a project (or reuse the one from the web version).</li>
+        <li>APIs &amp; Services → Library → enable <code>Google Drive API</code>.</li>
+        <li>OAuth consent screen → External → add yourself as a Test user.</li>
+        <li>Credentials → Create → <code>OAuth client ID</code> → <b>Android</b>. Package name <code>${esc(nativeInfo().package)}</code>, SHA-1 as shown below.</li>
+        <li>Come back here and tap Connect — Google Play services shows the sign-in.</li>
+      </ol>
+      <p class="note">Scope is <code>drive.file</code> — the app only ever sees the files it creates, nothing else in your Drive.</p>
+    </details>
+    <p class="note" style="margin-top:8px">App signing SHA-1: <code style="word-break:break-all">${esc(NATIVE.getSigningSha1()||'unavailable')}</code></p>
+    <p class="note">DeviceVault for Android ${esc(nativeInfo().version)} · package <code>${esc(nativeInfo().package)}</code></p>`
+    :`<details class="help"><summary>How to get a Client ID (one-time, ~5 min)</summary>
+      <ol>
+        <li>Open <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a> → create a project.</li>
+        <li>APIs &amp; Services → Library → enable <code>Google Drive API</code>.</li>
+        <li>OAuth consent screen → External → add yourself as a Test user.</li>
+        <li>Credentials → Create → <code>OAuth client ID</code> → <b>Web application</b>.</li>
+        <li>Under <b>Authorized JavaScript origins</b> add the exact address this page is served from (e.g. <code>${esc(location.origin)}</code>).</li>
+        <li>Copy the Client ID here and tap Connect.</li>
+      </ol>
+      <p class="note">Scope is <code>drive.file</code> — the app only ever sees the files it creates, nothing else in your Drive.</p>
+    </details>
+    <p class="note" style="margin-top:8px">Served from: <code>${esc(location.origin||'file://')}</code></p>`}
+  </div>
+
+  <div class="block">
+    <h4>Your data</h4>
+    <p class="note" style="margin:-2px 0 10px">${state.devices.length} device${state.devices.length!==1?'s':''} stored on this device${s.driveConnected?' · synced to Drive':''}.</p>
+    <div class="btnrow">
+      <button class="btn sm" onclick="exportData()">Export JSON</button>
+      <button class="btn sm" onclick="$('#importFile').click()">Import JSON</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" style="display:none"/>
+  </div>
+
+  <p class="note" style="text-align:center;margin:20px 0 8px">DeviceVault · runs entirely on your device. Keys &amp; data never touch any server except Google's APIs you configure.</p>
+  </div>`;
+
+  $('#s_key').addEventListener('change',e=>{s.geminiKey=e.target.value.trim();saveSettings();});
+  if($('#s_client')) $('#s_client').addEventListener('change',e=>{s.googleClientId=e.target.value.trim();saveSettings();});
+  $('#s_model').addEventListener('change',e=>{s.geminiModel=e.target.value;saveSettings();});
+  $('#s_ladder').addEventListener('change',e=>{ s.geminiLadder=e.target.value.split(/[\n,;]+/).map(x=>x.trim()).filter((x,i,a)=>x&&a.indexOf(x)===i); e.target.value=s.geminiLadder.join('\n'); saveSettings(); });
+  $('#s_lead').addEventListener('change',e=>{ const n=parseInt(e.target.value,10); s.warrantyLeadDays=isNaN(n)?30:Math.max(0,Math.min(365,n)); e.target.value=s.warrantyLeadDays; saveSettings(); });
+  $('#importFile').addEventListener('change',importData);
+}
+/* rank models: newest stable Flash first; previews / special-purpose models last */
+function modelScore(m){
+  const v=parseFloat((/gemini-(\d+(?:\.\d+)?)/.exec(m)||[])[1]||'0'); let s=v*10;
+  if(/flash/.test(m)) s+=3; if(/pro/.test(m)) s+=1; if(/lite/.test(m)) s-=1;
+  if(/preview|exp|image|tts|live|audio|embedding|transcribe|robotics|omni|nano|thinking|translate/.test(m)) s-=100;
+  return s;
+}
+window.fetchModels=async()=>{
+  const key=$('#s_key').value.trim(); if(!key){toast('Enter key first','err');return;}
+  state.settings.geminiKey=key; saveSettings();
+  toast('Loading models…');
+  try{
+    const models=(await Gemini.listModels(key)).sort((a,b)=>modelScore(b)-modelScore(a));
+    if(!models.length){toast('No models returned','err');return;}
+    const sel=$('#s_model'); const cur=state.settings.geminiModel;
+    const pref=models[0];
+    sel.innerHTML=models.map(m=>`<option value="${m}" ${m===cur?'selected':''}>${m}</option>`).join('');
+    if(!models.includes(cur)){ state.settings.geminiModel=pref; sel.value=pref; saveSettings(); }
+    toast(models.length+' models loaded','ok');
+  }catch(e){toast(e.message,'err');}
+};
+window.resetLadder=()=>{ state.settings.geminiLadder=Gemini.DEFAULT_LADDER.filter(m=>m!==state.settings.geminiModel); const t=$('#s_ladder'); if(t) t.value=state.settings.geminiLadder.join('\n'); saveSettings(); toast('Fallback ladder reset','ok'); };
+window.testGemini=async()=>{
+  const key=$('#s_key').value.trim(); if(!key){toast('Enter key first','err');return;}
+  state.settings.geminiKey=key; state.settings.geminiModel=$('#s_model').value; saveSettings();
+  toast('Testing…');
+  try{ const r=await Gemini.generateFull({key,model:state.settings.geminiModel,parts:[{text:'Reply with just: OK'}],maxOutputTokens:256}); toast('Working ✓ '+r.model+' ('+r.text.slice(0,20)+')'+(r.note?' — '+r.note:''), 'ok', r.note?8000:4000); }
+  catch(e){ toast(e.message,'err'); }
+};
+window.exportData=async()=>{
+  const out={v:1, exportedAt:new Date().toISOString(), devices:[]};
+  for(const d of state.devices){
+    const copy=JSON.parse(JSON.stringify(d)); delete copy._chat;
+    for(const key of ['photos','manuals']) for(const im of copy[key]||[]){ const b=await getBlob(im); if(b) im.data=await blobToDataURL(b); }
+    out.devices.push(copy);
+  }
+  const blob=new Blob([JSON.stringify(out)],{type:'application/json'});
+  await saveFile(blob,'devicevault-backup.json');
+  if(!NATIVE) toast('Exported','ok');
+};
+async function importData(e){
+  const file=e.target.files[0]; if(!file) return;
+  try{
+    const data=JSON.parse(await file.text());
+    let n=0;
+    for(const d of (data.devices||[])){
+      for(const key of ['photos','manuals']) for(const im of d[key]||[]){ if(im.data){ const b=await(await fetch(im.data)).blob(); await DB.blobSet(im.id,b); delete im.data; } }
+      if(!state.devices.find(x=>x.id===d.id)){ delete d._chat; state.devices.push(d); n++; }
+    }
+    await persistDevices(); toast('Imported '+n+' device'+(n!==1?'s':''),'ok'); setTab('devices');
+  }catch(err){ toast('Import failed: '+err.message,'err'); }
+}
+
+/* ---- Lightbox: images + PDF page viewer ---- */
+let _pdfView=null, _pdfQueue=Promise.resolve();
+window.openLightbox=(url,caption)=>{
+  const lb=$('#lightbox'); lb.classList.remove('pdf'); _pdfView=null;
+  $('#lightboxImg').src=url; $('#lbCap').textContent=caption||''; lb.classList.add('show');
+};
+window.closeLightbox=()=>{ const lb=$('#lightbox'); lb.classList.remove('show','pdf'); $('#lightboxImg').removeAttribute('src'); _pdfView=null; };
+$('#lightbox').addEventListener('click',e=>{if(e.target.id==='lightbox')closeLightbox();});
+window.openPdf=async(im,page=1)=>{
+  const lb=$('#lightbox'); lb.classList.add('show','pdf'); $('#lightboxImg').removeAttribute('src');
+  $('#lbCap').textContent=im.name||'PDF'; $('#pdfPos').textContent='Loading…';
+  $('#pdfPrev').disabled=$('#pdfNext').disabled=true;
+  const open=$('#pdfOpen'); open.removeAttribute('href'); open.style.display='none';
+  const canvas=$('#pdfCanvas'); canvas.width=canvas.height=0; canvas.style.width=canvas.style.height='';
+  open.onclick=null;
+  if(NATIVE){
+    open.href='#'; open.style.display='';
+    open.onclick=async e=>{ e.preventDefault(); const b=await getBlob(im); if(!b){ toast('PDF file not available on this device','err'); return; }
+      openWithApp(b, im.name||'manual.pdf').catch(err=>toast('Could not open the PDF: '+err.message,'err')); };
+  } else { const url=await imgUrl(im); if(url && url.startsWith('blob:')){ open.href=url; open.style.display=''; } }
+  try{
+    const doc=await PdfJs.doc(im);
+    if(!lb.classList.contains('pdf')) return; // closed meanwhile
+    _pdfView={im, doc, page:Math.min(Math.max(1,(page|0)||1), doc.numPages)};
+    pdfDraw();
+  }catch(e){
+    console.warn(e); $('#pdfPos').textContent='';
+    $('#lbCap').textContent=(navigator.onLine===false?'The PDF viewer needs internet to load':'Could not render this PDF')+(open.href?' — use Open ↗':'');
+  }
+};
+function pdfDraw(){
+  const v=_pdfView; if(!v) return; const want=v.page;
+  $('#pdfPos').textContent=`Page ${v.page} / ${v.doc.numPages}`;
+  $('#pdfPrev').disabled=v.page<=1; $('#pdfNext').disabled=v.page>=v.doc.numPages;
+  _pdfQueue=_pdfQueue.then(async()=>{
+    if(_pdfView!==v || v.page!==want) return; // superseded
+    const maxW=Math.min(window.innerWidth-40, 900);
+    await PdfJs.renderPage(v.doc, want, $('#pdfCanvas'), maxW, Math.min(2, window.devicePixelRatio||1));
+    $('#pdfWrap').scrollTop=0;
+  }).catch(e=>console.warn('pdf render',e));
+}
+window.pdfNav=(delta)=>{ const v=_pdfView; if(!v) return; const n=v.page+delta; if(n<1||n>v.doc.numPages) return; v.page=n; pdfDraw(); };
+
+/* ---- Bottom sheet ---- */
+function openSheet(html){ $('#sheet').innerHTML='<div class="handle"></div>'+html; $('#sheetbg').classList.add('show'); }
+window.closeSheet=()=>{ $('#sheetbg').classList.remove('show'); $('#sheet').innerHTML=''; };
+$('#sheetbg').addEventListener('click',e=>{ if(e.target.id==='sheetbg') closeSheet(); });
+
+/* ---- global file input routing ---- */
+$('#filePickCam').addEventListener('change',async e=>{
+  const inp=e.target; const files=[...inp.files]; const mode=inp.dataset.mode; inp.dataset.mode='';
+  if(!files.length) return;
+  if(mode==='identify'){ runIdentify(files[0]); }
+  else if(mode==='attach'){ const {full}=await processImage(files[0]); _attachPending={blob:full}; toast('Photo attached — add your question'); }
+  else if(mode==='label'){ runLabelScan(files[0]); }
+  else { handlePicked(files); }
+});
+$('#filePickPdf').addEventListener('change',e=>{ const files=[...e.target.files]; if(files.length) addPdfFiles(files); });
+
+/* ============================================================
+   Boot
+   ============================================================ */
+(async function boot(){
+  loadSettings();
+  await DB.open();
+  await loadDevices();
+  updateSyncPill();
+  render();
+  // best-effort silent Drive pull on load
+  if(state.settings.driveConnected && (NATIVE || state.settings.googleClientId)){
+    setTimeout(()=>{ if(Drive.ready()){ Drive.init(); pullFromDrive(true).then(()=>{ if(state.tab==='devices') renderDevices(); }); } },1500);
+  }
+})();
+</script>
+</body>
+</html>

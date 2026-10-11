@@ -1,0 +1,20 @@
+# Same AGP / Kotlin / Gradle baseline as the other Android projects on this machine.
+[versions]
+agp = "8.13.2"
+kotlin = "2.2.10"
+coreKtx = "1.17.0"
+activity = "1.11.0"
+webkit = "1.14.0"
+playServicesAuth = "21.3.0"
+junit = "4.13.2"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity" }
+androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "webkit" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
