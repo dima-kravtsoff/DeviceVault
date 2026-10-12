@@ -701,12 +701,16 @@ const Gemini = (()=>{
         console.warn('Gemini: '+m+' '+e.short+(kind==='search'?' (with Google Search)':'')+' — '+e.message);
       }
     }
-    const err=new Error((models.length>1?'All models failed — ':'')+failed.map(f=>f.replace(/ \(resting\)$/,'')).join('; ')+'. Last error: '+(lastErr?lastErr.message:'?'));
+    const skipped=failed.some(f=>/ \(resting\)$/.test(f));
+    const err=new Error((models.length>1?'All models failed — ':'')+failed.map(f=>f.replace(/ \(resting\)$/,' (skipped: failed earlier)')).join('; ')+'. Last error: '+(lastErr?lastErr.message:'?')
+      +(skipped?' Skipped models are retried automatically later, or now via Settings → Retry rested models.':''));
     err.status=lastErr&&lastErr.status; err.failed=failed; throw err;
   }
   const generate = async (opts)=>(await generateFull(opts)).text;
   const forget=()=>{ cooldown={}; try{ localStorage.removeItem('dv_model_cooldown'); }catch(e){} };
-  return {listModels, generate, generateFull, DEFAULT_LADDER, ladder, forget};
+  /* Stores a (possibly new) API key. Rest periods belong to the old key's project, so a different key starts fresh. */
+  const setKey=(key)=>{ key=String(key||'').trim(); if(key!==state.settings.geminiKey){ state.settings.geminiKey=key; forget(); saveSettings(); } };
+  return {listModels, generate, generateFull, DEFAULT_LADDER, ladder, forget, setKey};
 })();
 
 /* Build the manual context for a question: labelled photographed pages + PDF documents.
@@ -1631,7 +1635,7 @@ function renderSettings(){
   <p class="note" style="text-align:center;margin:20px 0 8px">DeviceVault · runs entirely on your device. Keys &amp; data never touch any server except Google's APIs you configure.</p>
   </div>`;
 
-  $('#s_key').addEventListener('change',e=>{s.geminiKey=e.target.value.trim();saveSettings();});
+  $('#s_key').addEventListener('change',e=>{Gemini.setKey(e.target.value);});
   if($('#s_client')) $('#s_client').addEventListener('change',e=>{s.googleClientId=e.target.value.trim();saveSettings();});
   $('#s_model').addEventListener('change',e=>{s.geminiModel=e.target.value;saveSettings();});
   $('#s_ladder').addEventListener('change',e=>{ s.geminiLadder=e.target.value.split(/[\n,;]+/).map(x=>x.trim()).filter((x,i,a)=>x&&a.indexOf(x)===i); e.target.value=s.geminiLadder.join('\n'); saveSettings(); });
@@ -1647,7 +1651,7 @@ function modelScore(m){
 }
 window.fetchModels=async()=>{
   const key=$('#s_key').value.trim(); if(!key){toast('Enter key first','err');return;}
-  state.settings.geminiKey=key; saveSettings();
+  Gemini.setKey(key);
   toast('Loading models…');
   try{
     const models=(await Gemini.listModels(key)).sort((a,b)=>modelScore(b)-modelScore(a));
@@ -1662,7 +1666,7 @@ window.fetchModels=async()=>{
 window.resetLadder=()=>{ state.settings.geminiLadder=Gemini.DEFAULT_LADDER.filter(m=>m!==state.settings.geminiModel); const t=$('#s_ladder'); if(t) t.value=state.settings.geminiLadder.join('\n'); saveSettings(); toast('Fallback ladder reset','ok'); };
 window.testGemini=async()=>{
   const key=$('#s_key').value.trim(); if(!key){toast('Enter key first','err');return;}
-  state.settings.geminiKey=key; state.settings.geminiModel=$('#s_model').value; saveSettings();
+  Gemini.setKey(key); state.settings.geminiModel=$('#s_model').value; saveSettings();
   toast('Testing…');
   try{ const r=await Gemini.generateFull({key,model:state.settings.geminiModel,parts:[{text:'Reply with just: OK'}],maxOutputTokens:256}); toast('Working ✓ '+r.model+' ('+r.text.slice(0,20)+')'+(r.note?' — '+r.note:''), 'ok', r.note?8000:4000); }
   catch(e){ toast(e.message,'err'); }
